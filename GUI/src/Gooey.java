@@ -11,6 +11,9 @@ public class Gooey extends JFrame {
 	// Main panel.
 	private JPanel panel;
 	
+	// Sub panel
+	private Clock clockPlace;
+	
 	// Start and stop buttons.
 	private JButton startButton, stopButton;
 
@@ -27,10 +30,10 @@ public class Gooey extends JFrame {
 
 		startButton = new JButton("START");
 		stopButton = new JButton("STOP");
+		clockPlace = null;
 
 		startButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					System.out.println("action");
 					start();
 				}
 			});
@@ -54,13 +57,20 @@ public class Gooey extends JFrame {
 
 	// Start up the robot
 	public void start() {
-		
+		System.out.println("action");
+		if(clockPlace == null) {
+			clockPlace = new Clock();
+			add(clockPlace);
+		}
+		repaint();
 	}
 
 
 	// Stop the robot
 	public void stop() {
-		
+		remove(clockPlace);
+		clockPlace = null;
+		repaint();
 	}
 
 	public static void main(String[] args) {
