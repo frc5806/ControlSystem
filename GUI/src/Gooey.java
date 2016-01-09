@@ -39,8 +39,6 @@ public class Gooey extends JFrame {
 		startButton = new JButton("START");
 		stopButton = new JButton("STOP");
 
-		//clockPlace = null;
-
 		ImageIcon[] pics = new ImageIcon[testPicNames.length];
 		for (int i = 0; i < pics.length; i++) {
 			pics[i] = new ImageIcon(testPicNames[i]);
@@ -80,10 +78,6 @@ public class Gooey extends JFrame {
 			add(clockPlace);
 			System.out.println("New Clock");
 		}
-		if(clockPlace == null) {
-			clockPlace = new Clock();
-			add(clockPlace);
-		}
 		repaint();
 	}
 
@@ -95,8 +89,6 @@ public class Gooey extends JFrame {
 		}
 		clockPlace = null;
 		System.out.println("Stop");
-		/*remove(clockPlace);
-		clockPlace = null;*/
 		repaint();
 	}
 
