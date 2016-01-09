@@ -28,8 +28,8 @@ public class Clock extends JPanel implements Runnable
 				
 				String remainingTime = LocalTime.ofSecondOfDay(150-totalSeconds).toString();
 				String passedTime = LocalTime.ofSecondOfDay(totalSeconds).toString();
-				String gameState = totalSeconds <= 15 ? " State: Autonomous" : " State: Tele Op";
-				time.setText(" Remaining: " + remainingTime + " Passed: " + passedTime + gameState);
+				String gameState = totalSeconds <= 15 ? "State: Autonomous" : "State: Tele Op";
+				time.setText(" Remaining: " + remainingTime + " Passed: " + passedTime + " " + gameState);
 				
 				totalSeconds++;
 			}
