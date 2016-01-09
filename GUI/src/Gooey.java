@@ -1,10 +1,11 @@
-import java.util.*;
+//import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.*;
-import java.io.*;
+//import java.awt.image.*;
+//import java.io.*;
 import javax.swing.*;
 
+// The commented out ones are never used. Sorry Keirsted
 
 /**
  * A GUI menu for the user. Entry point into the program. Allows the user to
@@ -94,6 +95,6 @@ public class Gooey extends JFrame {
 
 	public static void main(String[] args) {
 		System.out.println("\u000c");
-		Gooey mainWindow = new Gooey();
+		new Gooey();
 	}
 }

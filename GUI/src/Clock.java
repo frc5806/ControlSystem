@@ -1,4 +1,3 @@
-import java.awt.FlowLayout;
 import javax.swing.*;
 /*
  * Clock is a panel which displays the time passed, time remaining,
@@ -11,8 +10,6 @@ public class Clock extends JPanel
 	private JLabel time;
 	
 	public Clock() {
-		setLayout( new FlowLayout() );
-		
 		time = new JLabel("Time");
 		add(time);
 		
