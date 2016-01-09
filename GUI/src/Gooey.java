@@ -1,7 +1,10 @@
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.*;
+import java.io.*;
 import javax.swing.*;
+
 
 /**
  * A GUI menu for the user. Entry point into the program. Allows the user to
@@ -12,10 +15,15 @@ public class Gooey extends JFrame {
 	private JPanel panel;
 	
 	// Sub panel
-	private Clock clockPlace;
+	//private Clock clockPlace;
 	
 	// Start and stop buttons.
 	private JButton startButton, stopButton;
+	//private final String cameraImagePath;
+	private final String[] testPicNames = {
+			"pic1.jpeg", "pic2.jpeg", "pic3.jpg", "pic4.jpg"
+	};
+	private JLabel cameraFeed;
 
 	/*
 	 * GUI constructor.
@@ -30,7 +38,14 @@ public class Gooey extends JFrame {
 
 		startButton = new JButton("START");
 		stopButton = new JButton("STOP");
+
 		clockPlace = null;
+
+		ImageIcon[] pics = new ImageIcon[testPicNames.length];
+		for (int i = 0; i < pics.length; i++) {
+			pics[i] = new ImageIcon(testPicNames[i]);
+		}
+		cameraFeed = new JLabel(pics[0]);
 
 		startButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -52,6 +67,8 @@ public class Gooey extends JFrame {
 
 		add(startButton);
 		add(stopButton);
+		add(cameraFeed);
+		
 		setVisible( true);
 	}
 
