@@ -32,14 +32,14 @@ public class Gooey extends JFrame {
 	 */
 	public Gooey() {
 		super("Driver Controller");
-		setSize(300, 200);
+		setSize(1000, 1500);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(new FlowLayout());
-
+		
 		startButton = new JButton("START");
 		stopButton = new JButton("STOP");
 
-		clockPlace = null;
+		//clockPlace = null;
 
 		ImageIcon[] pics = new ImageIcon[testPicNames.length];
 		for (int i = 0; i < pics.length; i++) {
@@ -80,6 +80,10 @@ public class Gooey extends JFrame {
 			add(clockPlace);
 			System.out.println("New Clock");
 		}
+		if(clockPlace == null) {
+			clockPlace = new Clock();
+			add(clockPlace);
+		}
 		repaint();
 	}
 
@@ -90,6 +94,9 @@ public class Gooey extends JFrame {
 			remove(clockPlace);
 		}
 		clockPlace = null;
+		System.out.println("Stop");
+		/*remove(clockPlace);
+		clockPlace = null;*/
 		repaint();
 	}
 
