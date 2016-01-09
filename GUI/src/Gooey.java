@@ -8,24 +8,19 @@ import javax.swing.*;
  * stop the program.
  */
 public class Gooey extends JFrame {
-    // Main panel. Currently not used.
-    //private JPanel panel;
-
     // Clock Panel
-    private Clock clockPlace;
+    private Clock clockPanel;
 
     // Start and stop buttons.
     private JButton startButton, stopButton;
-    private String cameraImagePath = "pic1.jpeg";
+    private static final String CAMERA_IMAGE_PATH = "pic1.jpeg";
     private JLabel cameraFeed;
 
-    /*
-     * GUI constructor.
-     *
-     * Makes and attaches methods to buttons, and starts a listener thread.
-     */
+    // Makes and attaches methods to buttons, and starts a listener thread.
+    
     public Gooey() {
         super("Driver Controller");
+        
         setSize(Toolkit.getDefaultToolkit().getScreenSize());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new FlowLayout());
@@ -33,25 +28,19 @@ public class Gooey extends JFrame {
         startButton = new JButton("START");
         stopButton = new JButton("STOP");
 
-        cameraFeed = new JLabel(new ImageIcon(cameraImagePath));
+        cameraFeed = new JLabel(new ImageIcon(CAMERA_IMAGE_PATH));
 
         startButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    start();
-                }
-            });
+	        public void actionPerformed(ActionEvent e) { start(); }
+        });
 
         stopButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    stop();
-                }
-            });
+	        public void actionPerformed(ActionEvent e) { stop(); }
+        });
 
         addWindowListener(new WindowAdapter() {
-                public void windowClosing(WindowEvent e) {
-                    stop();
-                }
-            });
+	        public void windowClosing(WindowEvent e) { stop(); }
+        });
 
         add(startButton);
         add(stopButton);
@@ -63,9 +52,9 @@ public class Gooey extends JFrame {
     // Start up the robot
     public void start() {
         System.out.println("Start");
-        if(clockPlace == null) {
-            clockPlace = new Clock();
-            add(clockPlace);
+        if(clockPanel == null) {
+            clockPanel = new Clock();
+            add(clockPanel);
             System.out.println("New Clock");
         }
         repaint();
@@ -73,10 +62,10 @@ public class Gooey extends JFrame {
 
     // Stop the robot
     public void stop() {
-        if (clockPlace!=null) {
-            remove(clockPlace);
+        if (clockPanel!=null) {
+            remove(clockPanel);
         }
-        clockPlace = null;
+        clockPanel = null;
         System.out.println("Stop");
         repaint();
     }
