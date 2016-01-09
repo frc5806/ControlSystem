@@ -8,72 +8,80 @@ import javax.swing.*;
  * stop the program.
  */
 public class Gooey extends JFrame {
-    // Main panel.
-    private JPanel panel;
-    
-    int testVariable;
-    
-    // Start and stop buttons.
-    private JButton startButton, stopButton;
+	// Main panel.
+	private JPanel panel;
+	
+	// Start and stop buttons.
+	private JButton startButton, stopButton;
 
-    /*
-     * GUI constructor.
-     *
-     * Makes and attaches methods to buttons, and starts a listener thread.
-     */
-    public Gooey() {
-        super("Noble Driver Station");
-        setSize(300, 200);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new FlowLayout());
+	// Joystick that controlls the robot. Get motor values from this.
+	Joystick joystick;
 
-        startButton = new JButton("START");
-        stopButton = new JButton("STOP");
+	/*
+	 * GUI constructor.
+	 *
+	 * Makes and attaches methods to buttons, and starts a listener thread.
+	 */
+	public Gooey() {
+		super("5806 Driver Station");
+		setSize(300, 200);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setLayout(new FlowLayout());
 
-        startButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    System.out.println("action");
-                    start();
-                }
-            });
+		startButton = new JButton("START");
+		stopButton = new JButton("STOP");
 
-        stopButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    stop();
-                }
-            });
+		startButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					System.out.println("action");
+					start();
+				}
+			});
 
-        addWindowListener(new WindowAdapter() {
-                public void windowClosing(WindowEvent e) {
-                    stop();
-                }
-            });
+		stopButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					stop();
+				}
+			});
 
-        add(startButton);
-        add(stopButton);
-        setVisible( true);
-    }
+		addWindowListener(new WindowAdapter() {
+				public void windowClosing(WindowEvent e) {
+					stop();
+				}
+			});
 
-    /*
-     * Listener thread soft-start function.
-     *
-     * Sets motors values away from zero (undoes the stop() function).
-     */
-    public void start() {
-        
-    }
+		add(startButton);
+		add(stopButton);
+		setVisible( true);
+	}
 
-    /*
-     * Listener thread soft-stop function.
-     *
-     * Sets sent motor values to zero.
-     */
-    public void stop() {
-        
-    }
+	// Start up the robot
+	public void start() {
+		joystick = findJoystick();
+	}
 
-    public static void main(String[] args) {
-        System.out.println("\u000c");
-        Gooey mainWindow = new Gooey();
-    }
+	// Return a joystick that is plugged into the computer
+	public Joystick findJoystick() {
+		Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
+
+        for (Controller controller : controllers) {
+            System.out.println("c: " + controller.getName() + "; " + controller.getPortNumber());
+            if(controller.getType() == Controller.Type.STICK) {
+            	return new Joystick(controller);
+            }
+        }
+	}
+
+	// Stop the robot
+	public void stop() {
+		if(listenerThread != null) {
+			listenerThread.close();
+			listenerThreadShell.interrupt();
+		}
+	}
+
+	public static void main(String[] args) {
+		System.out.println("\u000c");
+		Gooey mainWindow = new Gooey();
+	}
 }
