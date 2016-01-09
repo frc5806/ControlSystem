@@ -7,21 +7,21 @@ import javax.swing.*;
 public class Clock extends JPanel
 		implements Runnable
 {
-	private final String remain = " Remaining: ";
-	private final String passed = " Passed: ";
 	private int totalTime = 0;
-	private JLabel time = new JLabel("Time");
+	private JLabel time;
 	
 	public Clock() {
-		// TODO Make better
 		setLayout( new FlowLayout() );
+		
+		new JLabel("Time");
 		add(time);
+		
 		Thread t = new Thread( this );
-        t.start();
+		t.start();
 	}
 	
 	private String getState() {
-		if (totalTime<15) {
+		if (totalTime <= 15) {
 			return " Autonomous";
 		}
 		
@@ -30,13 +30,16 @@ public class Clock extends JPanel
 	
 	public void run() {
 		try {
-			while (totalTime<=150) {
+			while (totalTime <= 150) {
 				Thread.sleep(1000);
+				
 				totalTime++;
-				time.setText(remain +((150-totalTime)/60) +":" +((150-totalTime)%60) +passed +(totalTime/60) +":" +(totalTime%60) +getState() );
+				time.setText(" Remaining: " +((150-totalTime)/60) +":" +((150-totalTime)%60) + " Passed: " +(totalTime/60) +":" +(totalTime%60) +getState() );
 			}
 			time.setText("FINISHED!!!");
-		} catch (InterruptedException ie) {System.out.println("Interrupted Exection on Clock thread."); } 
+		} catch (InterruptedException ie) {
+			System.out.println("Interrupted Exection on Clock thread."); 
+		} 
 	}
 
 }
