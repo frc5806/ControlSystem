@@ -60,10 +60,7 @@ public class Gooey extends JFrame {
 
 	// Stop the robot
 	public void stop() {
-		if(listenerThread != null) {
-			listenerThread.close();
-			listenerThreadShell.interrupt();
-		}
+		
 	}
 
 	public static void main(String[] args) {
