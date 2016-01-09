@@ -7,13 +7,13 @@ import javax.swing.*;
 public class Clock extends JPanel
 		implements Runnable
 {
-	private int totalTime = 0;
+	private int totalSeconds = 0;
 	private JLabel time;
 	
 	public Clock() {
 		setLayout( new FlowLayout() );
 		
-		new JLabel("Time");
+		time = new JLabel("Time");
 		add(time);
 		
 		Thread t = new Thread( this );
@@ -21,7 +21,7 @@ public class Clock extends JPanel
 	}
 	
 	private String getState() {
-		if (totalTime <= 15) {
+		if (totalSeconds <= 15) {
 			return " Autonomous";
 		}
 		
@@ -30,11 +30,11 @@ public class Clock extends JPanel
 	
 	public void run() {
 		try {
-			while (totalTime <= 150) {
+			while (totalSeconds <= 150) {
 				Thread.sleep(1000);
 				
-				totalTime++;
-				time.setText(" Remaining: " +((150-totalTime)/60) +":" +((150-totalTime)%60) + " Passed: " +(totalTime/60) +":" +(totalTime%60) +getState() );
+				totalSeconds++;
+				time.setText(" Remaining: " +((150-totalSeconds)/60) +":" +((150-totalSeconds)%60) + " Passed: " +(totalSeconds/60) +":" +(totalSeconds%60) +getState() );
 			}
 			time.setText("FINISHED!!!");
 		} catch (InterruptedException ie) {
