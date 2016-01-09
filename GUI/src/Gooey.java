@@ -16,10 +16,7 @@ public class Gooey extends JFrame {
 
     // Start and stop buttons.
     private JButton startButton, stopButton;
-    //private final String cameraImagePath;
-    private final String[] testPicNames = {
-            "pic1.jpeg", "pic2.jpeg", "pic3.jpg", "pic4.jpg"
-    };
+    private String cameraImagePath = "pic1.jpeg";
     private JLabel cameraFeed;
 
     /*
@@ -36,11 +33,7 @@ public class Gooey extends JFrame {
         startButton = new JButton("START");
         stopButton = new JButton("STOP");
 
-        ImageIcon[] pics = new ImageIcon[testPicNames.length];
-        for (int i = 0; i < pics.length; i++) {
-            pics[i] = new ImageIcon(testPicNames[i]);
-        }
-        cameraFeed = new JLabel(pics[0]);
+        cameraFeed = new JLabel(new ImageIcon(cameraImagePath));
 
         startButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -92,8 +85,4 @@ public class Gooey extends JFrame {
 		System.out.println("\u000c");
 		new Gooey();
 	}
-    public static void main(String[] args) {
-        System.out.println("\u000c");
-        Gooey mainWindow = new Gooey();
-    }
 }
