@@ -23,7 +23,7 @@ public class Gooey extends JFrame {
 	 * Makes and attaches methods to buttons, and starts a listener thread.
 	 */
 	public Gooey() {
-		super("Nick C you had 1 Job");
+		super("Driver Controller");
 		setSize(300, 200);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(new FlowLayout());
