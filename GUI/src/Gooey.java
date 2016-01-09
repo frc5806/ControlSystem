@@ -14,9 +14,6 @@ public class Gooey extends JFrame {
 	// Start and stop buttons.
 	private JButton startButton, stopButton;
 
-	// Joystick that controlls the robot. Get motor values from this.
-	Joystick joystick;
-
 	/*
 	 * GUI constructor.
 	 *
@@ -57,20 +54,9 @@ public class Gooey extends JFrame {
 
 	// Start up the robot
 	public void start() {
-		joystick = findJoystick();
+		
 	}
 
-	// Return a joystick that is plugged into the computer
-	public Joystick findJoystick() {
-		Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
-
-        for (Controller controller : controllers) {
-            System.out.println("c: " + controller.getName() + "; " + controller.getPortNumber());
-            if(controller.getType() == Controller.Type.STICK) {
-            	return new Joystick(controller);
-            }
-        }
-	}
 
 	// Stop the robot
 	public void stop() {
