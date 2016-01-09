@@ -22,24 +22,31 @@ public class Clock extends JPanel
 	
 	private String getState() {
 		if (totalSeconds <= 15) {
-			return " Autonomous";
+			return " State: Autonomous";
 		}
 		
-		return " Tele Op";
+		return " State: Tele Op";
+	}
+	
+	private String addZero(int secs) {
+		if (secs < 10) {
+			return ("0" + Integer.toString(secs));
+		}
+		return Integer.toString(secs);
 	}
 	
 	public void run() {
-		try {
-			while (totalSeconds <= 150) {
-				Thread.sleep(1000);
-				
+		long pastTime = System.currentTimeMillis();
+		while (totalSeconds <= 150) {
+			long current = System.currentTimeMillis();
+			if ((current - pastTime) >= 1000) {
+				pastTime = current;
+				time.setText(" Remaining: " +((150-totalSeconds)/60) +":" +addZero((150-totalSeconds)%60) + " Passed: " +(totalSeconds/60) +":" +addZero(totalSeconds%60) +getState() );
 				totalSeconds++;
-				time.setText(" Remaining: " +((150-totalSeconds)/60) +":" +((150-totalSeconds)%60) + " Passed: " +(totalSeconds/60) +":" +(totalSeconds%60) +getState() );
+				//repaint();
 			}
-			time.setText("FINISHED!!!");
-		} catch (InterruptedException ie) {
-			System.out.println("Interrupted Exection on Clock thread."); 
-		} 
+		}
+		time.setText("FINISHED!!!");
 	}
 
 }

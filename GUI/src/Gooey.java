@@ -11,11 +11,11 @@ import javax.swing.*;
  * stop the program.
  */
 public class Gooey extends JFrame {
-	// Main panel.
-	private JPanel panel;
+	// Main panel. Currently not used.
+	//private JPanel panel;
 	
-	// Sub panel
-	//private Clock clockPlace;
+	// Clock Panel
+	private Clock clockPlace;
 	
 	// Start and stop buttons.
 	private JButton startButton, stopButton;
@@ -74,10 +74,11 @@ public class Gooey extends JFrame {
 
 	// Start up the robot
 	public void start() {
-		System.out.println("action");
+		System.out.println("Start");
 		if(clockPlace == null) {
 			clockPlace = new Clock();
 			add(clockPlace);
+			System.out.println("New Clock");
 		}
 		repaint();
 	}
@@ -85,7 +86,9 @@ public class Gooey extends JFrame {
 
 	// Stop the robot
 	public void stop() {
-		remove(clockPlace);
+		if (clockPlace!=null) {
+			remove(clockPlace);
+		}
 		clockPlace = null;
 		repaint();
 	}
