@@ -36,26 +36,33 @@ public class Gooey extends JFrame {
 
     
     public Gooey() {
+    	// Sets title bar
         super("Driver Controller");
         
+        //Sets screen size
         setSize(Toolkit.getDefaultToolkit().getScreenSize());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(5,5));
 
+        //initialize the JPanels
         header = new JPanel();
         center = new JPanel();
         clockBase = new JPanel();
         
+        //And the buttons
         startButton = new JButton("START");
 
+        //And the labels
         cameraFeed = new JLabel(new ImageIcon(CAMERA_IMAGE_PATH));
         batteryAmount = new JLabel("Battery Remaining: Infinity %");
 
+        // Add a listener to the start button to call start()/stop()
         startButton.addActionListener(new ActionListener() {
 	        public void actionPerformed(ActionEvent e) { if (timerRunning) {stop();}
 	        else {start();}}
         });
-
+        
+        // Add a listener for when the window closes to call stop()
         addWindowListener(new WindowAdapter() {
 	        public void windowClosing(WindowEvent e) { stop(); }
         });
@@ -71,6 +78,7 @@ public class Gooey extends JFrame {
         header.add(clockBase);
         header.add(batteryAmount);
         
+        // Add everything to the big panel
         add(header, BorderLayout.PAGE_START);
         add(center, BorderLayout.CENTER);
 
@@ -78,6 +86,7 @@ public class Gooey extends JFrame {
     }
 
     // Start up the robot
+    // Start clock
     private void start() {
         if (DEBUG) {System.out.println("Start");}
         if(clockPanel == null) {
@@ -91,6 +100,7 @@ public class Gooey extends JFrame {
     }
 
     // Stop the robot
+    // Stop clock
     private void stop() {
         if (clockPanel!=null) {
             clockBase.remove(clockPanel);
