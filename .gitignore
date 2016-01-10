@@ -26,6 +26,9 @@ local.properties
 # Eclipse Core
 .project
 
+# BlueJ file
+README.txt
+
 # External tool builders
 .externalToolBuilders/
 
