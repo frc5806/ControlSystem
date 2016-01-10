@@ -20,7 +20,7 @@ public class Clock extends JPanel implements Runnable
 	}
 	
 	public void run() {
-		long pastTime = System.currentTimeMillis();
+		long pastTime = 0;
 		while (totalSeconds <= 150) {
 			long current = System.currentTimeMillis();
 			if ((current - pastTime) >= 1000) {

@@ -12,6 +12,7 @@ public class Gooey extends JFrame {
 	// two main panels for organization
 	private JPanel header;
 	private JPanel center;
+	private JPanel startStop;
 	
     // Clock Panel
     private Clock clockPanel;
@@ -32,6 +33,7 @@ public class Gooey extends JFrame {
 
         header = new JPanel();
         center = new JPanel();
+        startStop = new JPanel();
         
         startButton = new JButton("START");
         stopButton = new JButton("STOP");
@@ -53,16 +55,12 @@ public class Gooey extends JFrame {
         // Set layouts of panels
         header.setLayout(new GridLayout( 0, 3));
         center.setLayout(new GridLayout( 0, 3, 10, 10));
+        startStop.setLayout(new GridLayout( 2, 0, 0, 0));
         
-        header.add(startButton);
-        header.add(stopButton);
+        startStop.add(startButton);
+        startStop.add(stopButton);
         center.add(cameraFeed);
-        
-        /*
-        add(startButton);
-        add(stopButton);
-        add(cameraFeed);
-        */
+        header.add(startStop);
         
         add(header, BorderLayout.PAGE_START);
         add(center, BorderLayout.CENTER);
@@ -71,7 +69,7 @@ public class Gooey extends JFrame {
     }
 
     // Start up the robot
-    public void start() {
+    private void start() {
         System.out.println("Start");
         if(clockPanel == null) {
             clockPanel = new Clock();
@@ -82,7 +80,7 @@ public class Gooey extends JFrame {
     }
 
     // Stop the robot
-    public void stop() {
+    private void stop() {
         if (clockPanel!=null) {
             header.remove(clockPanel);
         }
