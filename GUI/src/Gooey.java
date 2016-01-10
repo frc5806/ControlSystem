@@ -9,10 +9,20 @@ import javax.swing.*;
  */
 public class Gooey extends JFrame {
 	
+	/* 
+	 * Debug variable for testing and writing purposes
+	 * Please wrap all System.out.println();'s in
+	 * an if (DEBUG) {}
+	 */
+
+	private static final boolean DEBUG = true;
+	
 	// two main panels for organization
 	private JPanel header;
 	private JPanel center;
 	private JPanel startStop;
+	private JPanel clockBase;
+	private JPanel batteryHold;
 	
     // Clock Panel
     private Clock clockPanel;
@@ -21,6 +31,8 @@ public class Gooey extends JFrame {
     private JButton startButton, stopButton;
     private static final String CAMERA_IMAGE_PATH = "pic1.jpeg";
     private JLabel cameraFeed;
+    private JLabel batteryLabel;
+    private JLabel batteryAmount;
 
     // Makes and attaches methods to buttons, and starts a listener thread.
     
@@ -34,11 +46,15 @@ public class Gooey extends JFrame {
         header = new JPanel();
         center = new JPanel();
         startStop = new JPanel();
+        clockBase = new JPanel();
+        batteryHold = new JPanel();
         
         startButton = new JButton("START");
         stopButton = new JButton("STOP");
 
         cameraFeed = new JLabel(new ImageIcon(CAMERA_IMAGE_PATH));
+        batteryLabel = new JLabel("Battery Remaining:");
+        batteryAmount = new JLabel("Infinity %");
 
         startButton.addActionListener(new ActionListener() {
 	        public void actionPerformed(ActionEvent e) { start(); }
@@ -55,12 +71,20 @@ public class Gooey extends JFrame {
         // Set layouts of panels
         header.setLayout(new GridLayout( 0, 3));
         center.setLayout(new GridLayout( 0, 3, 10, 10));
-        startStop.setLayout(new GridLayout( 2, 0, 0, 0));
+        startStop.setLayout(new GridLayout( 2, 0));
+        batteryHold.setLayout(new GridLayout(2,0));
         
+        //Add components to sub-panels
         startStop.add(startButton);
         startStop.add(stopButton);
+        batteryHold.add(batteryLabel);
+        batteryHold.add(batteryAmount);
+        
+        //Add sub-panels to main panels
         center.add(cameraFeed);
         header.add(startStop);
+        header.add(clockBase);
+        header.add(batteryHold);
         
         add(header, BorderLayout.PAGE_START);
         add(center, BorderLayout.CENTER);
@@ -70,11 +94,11 @@ public class Gooey extends JFrame {
 
     // Start up the robot
     private void start() {
-        System.out.println("Start");
+        if (DEBUG) {System.out.println("Start");}
         if(clockPanel == null) {
             clockPanel = new Clock();
-            header.add(clockPanel);
-            System.out.println("New Clock");
+            clockBase.add(clockPanel);
+            if (DEBUG) {System.out.println("New Clock");}
         }
         repaint();
     }
@@ -82,15 +106,15 @@ public class Gooey extends JFrame {
     // Stop the robot
     private void stop() {
         if (clockPanel!=null) {
-            header.remove(clockPanel);
+            clockBase.remove(clockPanel);
         }
         clockPanel = null;
-        System.out.println("Stop");
+        if (DEBUG) {System.out.println("Stop"); }
         repaint();
     }
 
 	public static void main(String[] args) {
-		System.out.println("\u000c");
+		if (DEBUG) {System.out.println("\u000c"); }
 		new Gooey();
 	}
 }
