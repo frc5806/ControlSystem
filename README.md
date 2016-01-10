@@ -12,7 +12,3 @@ Team 5806's drive system for FRC Stronghold.
 - Control simple drive train
 - Battery and ETA
 - Field Mini-map
-
-## Patch History
-
-- Added Timer
