@@ -24,7 +24,7 @@ local.properties
 .loadpath
 
 # Eclipse Core
-.project
+# .project
 
 # BlueJ file
 README.txt
@@ -39,7 +39,7 @@ README.txt
 .cproject
 
 # JDT-specific (Eclipse Java Development Tools)
-.classpath
+# .classpath
 
 # Java annotation processor (APT)
 .factorypath
