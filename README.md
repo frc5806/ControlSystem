@@ -1,4 +1,5 @@
 # DriveSystem
+
 Team 5806's drive system for FRC Stronghold.
 
 ## TODO
@@ -10,9 +11,8 @@ Team 5806's drive system for FRC Stronghold.
 - Integrate video feed
 - Control simple drive train
 - Battery and ETA
-
 - Field Mini-map
 
-
 ## Patch History
+
 - Added Timer
