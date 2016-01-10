@@ -28,7 +28,7 @@ public class Gooey extends JFrame {
         
         setSize(Toolkit.getDefaultToolkit().getScreenSize());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new FlowLayout());
+        setLayout(new BorderLayout(5,5));
 
         header = new JPanel();
         center = new JPanel();
@@ -64,8 +64,8 @@ public class Gooey extends JFrame {
         add(cameraFeed);
         */
         
-        add(header);
-        add(center);
+        add(header, BorderLayout.PAGE_START);
+        add(center, BorderLayout.CENTER);
 
         setVisible(true);
     }
