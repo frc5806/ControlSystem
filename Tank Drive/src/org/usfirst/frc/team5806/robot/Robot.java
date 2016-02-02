@@ -57,9 +57,10 @@ public class Robot extends IterativeRobot {
     		lsRemaining -= SPEED_RAMP_INCREMENT;
     	} else {
     		double incoming = joystick.getRawAxis(1);
-    		if (incoming - leftStick > MOVE_THRESHOLD || incoming - leftStick < -MOVE_THRESHOLD) {
+    		double desiredChange = incoming - leftStick;
+    		if (desiredChange > MOVE_THRESHOLD || desiredChange < -MOVE_THRESHOLD) {
     			//joystick input is enough to warrant changing the motor
-    			lsRemaining = incoming;
+    			lsRemaining = desiredChange;
     			rampingLeftSpeed = true;
     		}
     	}
@@ -68,9 +69,10 @@ public class Robot extends IterativeRobot {
     		rsRemaining -= SPEED_RAMP_INCREMENT;
     	} else {
     		double incoming = joystick.getRawAxis(5);
-    		if (incoming - rightStick > MOVE_THRESHOLD || incoming - rightStick < -MOVE_THRESHOLD) {
+    		double desiredChange = incoming - rightStick;
+    		if (desiredChange > MOVE_THRESHOLD || desiredChange < -MOVE_THRESHOLD) {
     			//joystick input is enough to warrant changing the motor
-    			rsRemaining = incoming;
+    			rsRemaining = desiredChange;
     			rampingRightSpeed = true;
     		}
     	}
