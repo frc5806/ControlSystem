@@ -17,6 +17,7 @@ public class Robot extends IterativeRobot {
 	private static final double MOVE_THRESHOLD = 0.05;
 	// AMOUNT BY WHICH MOTORS ARE INCREMENTED WHEN ACCELERATING
 	private static final double SPEED_RAMP_INCREMENT = 0.05;
+	private static final double RAMP_COEFFICIENT = 0.1;
 
 	private static double leftStick = 0;
 	private static double rightStick = 0;
@@ -24,6 +25,8 @@ public class Robot extends IterativeRobot {
 	private static double rsRemaining = 0;
 	private static boolean rampingLeftSpeed = false;
 	private static boolean rampingRightSpeed = false;
+	
+	private static double limitedJoyL, limitedJoyR;
 
 	public void robotInit() {
 		robot = new RobotDrive(1, 0);
@@ -51,9 +54,22 @@ public class Robot extends IterativeRobot {
 	}
 
 	public void teleopInit() {
+		limitedJoyL = 0;
+		limitedJoyR = 0;
+	}
+	
+	public void teleopPeriodic() {
+		//using exponential moving averages for joystick limiting
+		double desiredL = joystick.getRawAxis(1);
+		double desiredR = joystick.getRawAxis(5);
+		double errorL = desiredL - limitedJoyL;
+		double errorR = desiredR - limitedJoyR;
+		limitedJoyL += errorL * RAMP_COEFFICIENT;
+		limitedJoyR += errorR * RAMP_COEFFICIENT;
+		robot.tankDrive(DAMPENING_COEFFICIENT*limitedJoyL, DAMPENING_COEFFICIENT*limitedJoyR, true);
 	}
 
-	public void teleopPeriodic() {
+	/*public void teleopPeriodic() {
 		// For Xbox Controller
 
 		// Calculate stick amounts.
@@ -109,5 +125,5 @@ public class Robot extends IterativeRobot {
 			}
 		}
 
-	}
+	}*/
 }
