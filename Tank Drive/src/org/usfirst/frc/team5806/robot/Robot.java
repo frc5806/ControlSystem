@@ -11,11 +11,20 @@ public class Robot extends IterativeRobot {
 	RobotDrive robot;
 	Joystick joystick;
 	Encoder[] encoders;
-	private static final double speedRampIncrement = 0.05;
 	
 	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
 	private static final double DAMPENING_COEFFICIENT = -0.75;
+	//MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
 	private static final double MOVE_THRESHOLD = 0.05;
+	//AMOUNT BY WHICH MOTORS ARE INCREMENTED WHEN ACCELERATING
+	private static final double SPEED_RAMP_INCREMENT = 0.05;
+	
+	private static double leftStick = 0;
+    private static double rightStick = 0;
+    private static double lsRemaining = 0;
+    private static double rsRemaining = 0;
+    private static boolean rampingLeftSpeed = false;
+    private static boolean rampingRightSpeed = false;
     
     public void robotInit() {
          robot = new RobotDrive(1, 0);
@@ -40,18 +49,12 @@ public class Robot extends IterativeRobot {
     public void autonomousPeriodic() {}
     public void teleopInit() {}
     
-    private static double leftStick = 0;
-    private static double rightStick = 0;
-    private static double lsRemaining = 0;
-    private static double rsRemaining = 0;
-    private static boolean rampingLeftSpeed = false;
-    private static boolean rampingRightSpeed = false;
     
     public void teleopPeriodic() {
     	// For Xbox Controller
     	if (rampingLeftSpeed) {
-    		leftStick += speedRampIncrement;
-    		lsRemaining -= speedRampIncrement;
+    		leftStick += SPEED_RAMP_INCREMENT;
+    		lsRemaining -= SPEED_RAMP_INCREMENT;
     	} else {
     		double incoming = joystick.getRawAxis(1);
     		if (incoming - leftStick > MOVE_THRESHOLD || incoming - leftStick < -MOVE_THRESHOLD) {
@@ -61,8 +64,8 @@ public class Robot extends IterativeRobot {
     		}
     	}
     	if (rampingRightSpeed) {
-    		rightStick += speedRampIncrement;
-    		rsRemaining -= speedRampIncrement;
+    		rightStick += SPEED_RAMP_INCREMENT;
+    		rsRemaining -= SPEED_RAMP_INCREMENT;
     	} else {
     		double incoming = joystick.getRawAxis(5);
     		if (incoming - rightStick > MOVE_THRESHOLD || incoming - rightStick < -MOVE_THRESHOLD) {
