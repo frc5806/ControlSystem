@@ -7,6 +7,29 @@ import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 public class Robot extends IterativeRobot {
+	
+	private class Button {
+		public boolean alreadyRead = false;
+		Joystick joystick;
+		private int buttonIndex;
+		
+		public Button(Joystick joystick, int buttonIndex) {
+			this.joystick = joystick;
+			this.buttonIndex = buttonIndex;
+		}
+		
+		public boolean readButton() {
+			boolean buttonValue = joystick.getRawButton(buttonIndex);
+			boolean returnValue = buttonValue == true && alreadyRead == false;
+			
+			// Set alreadyRead
+			if(buttonValue == true) alreadyRead = true;
+			else alreadyRead = false;
+			
+			return returnValue;
+		}
+	}
+	
 	RobotDrive robot;
 	Joystick joystick;
 	Encoder[] encoders;
@@ -14,17 +37,11 @@ public class Robot extends IterativeRobot {
 	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
 	private static final double DAMPENING_COEFFICIENT = -0.75;
 	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
-	private static final double MOVE_THRESHOLD = 0.05;
-	// AMOUNT BY WHICH MOTORS ARE INCREMENTED WHEN ACCELERATING
-	private static final double SPEED_RAMP_INCREMENT = 0.05;
-	private static final double RAMP_COEFFICIENT = 0.1;
+	private static double rampCoefficient = 0.05;
+	
+	Button addButton;
+	Button subtractButton;
 
-	private static double leftStick = 0;
-	private static double rightStick = 0;
-	private static double lsRemaining = 0;
-	private static double rsRemaining = 0;
-	private static boolean rampingLeftSpeed = false;
-	private static boolean rampingRightSpeed = false;
 	
 	private static double limitedJoyL, limitedJoyR;
 
@@ -37,13 +54,13 @@ public class Robot extends IterativeRobot {
 		encoders[0].reset();
 		encoders[1] = new Encoder(2, 3);
 		encoders[1].reset();
+		
+		addButton = new Button(joystick, 3);
+		subtractButton = new Button(joystick, 4);
 	}
 
 	public void testPeriodic() {
 		LiveWindow.run();
-
-		System.out.println("encoders: " + encoders[0].getDistance() + "\t" + encoders[1].getDistance());
-
 		teleopPeriodic();
 	}
 
@@ -59,71 +76,22 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void teleopPeriodic() {
+		if(addButton.readButton()) {
+			rampCoefficient += 0.01;
+			System.out.println("Button: " + rampCoefficient);
+		}
+		if(subtractButton.readButton()) {
+			rampCoefficient -= 0.01;
+			System.out.println("Button: " + rampCoefficient);
+		}
+		
 		//using exponential moving averages for joystick limiting
 		double desiredL = joystick.getRawAxis(1);
 		double desiredR = joystick.getRawAxis(5);
 		double errorL = desiredL - limitedJoyL;
 		double errorR = desiredR - limitedJoyR;
-		limitedJoyL += errorL * RAMP_COEFFICIENT;
-		limitedJoyR += errorR * RAMP_COEFFICIENT;
-		robot.tankDrive(DAMPENING_COEFFICIENT*limitedJoyL, DAMPENING_COEFFICIENT*limitedJoyR, true);
+		limitedJoyL += errorL * rampCoefficient;
+		limitedJoyR += errorR * rampCoefficient;
+		//robot.tankDrive(DAMPENING_COEFFICIENT*limitedJoyL, DAMPENING_COEFFICIENT*limitedJoyR, true);
 	}
-
-	/*public void teleopPeriodic() {
-		// For Xbox Controller
-
-		// Calculate stick amounts.
-		calculateStick(true);
-		calculateStick(false);
-
-		if (lsRemaining <= 0) {
-			// have ramped all the way up to the last inputted joy value
-			rampingLeftSpeed = false;
-		}
-		if (rsRemaining <= 0) {
-			// have ramped all the way up to the last inputted joy value
-			rampingRightSpeed = false;
-		}
-
-		robot.tankDrive(DAMPENING_COEFFICIENT * leftStick, DAMPENING_COEFFICIENT * rightStick, true);
-	}
-
-	// set side to true for right side, false for left side
-	public void calculateStick(boolean side) {
-		// Set variables
-		// IF SOMEONE KNOWS HOW TO MAKE REFERENCES IN JAVA
-		// THIS FUNCTION WOULD BE MUCH NICER
-		boolean ramping = rampingLeftSpeed;
-		int joystickNum = 1;
-		double stick = leftStick;
-		if (side) {
-			ramping = rampingRightSpeed;
-			joystickNum = 5;
-			stick = rightStick;
-		}
-
-		if (ramping) {
-			if (side) {
-				rightStick += SPEED_RAMP_INCREMENT;
-				rsRemaining -= SPEED_RAMP_INCREMENT;
-			} else {
-				leftStick += SPEED_RAMP_INCREMENT;
-				lsRemaining -= SPEED_RAMP_INCREMENT;
-			}
-		} else {
-			double incoming = joystick.getRawAxis(joystickNum);
-			double desiredChange = incoming - stick;
-			if (desiredChange > MOVE_THRESHOLD || desiredChange < -MOVE_THRESHOLD) {
-				// joystick input is enough to warrant changing the motor
-				if (side) {
-					rsRemaining = desiredChange;
-					rampingRightSpeed = true;
-				} else {
-					lsRemaining = desiredChange;
-					rampingLeftSpeed = true;
-				}
-			}
-		}
-
-	}*/
 }
