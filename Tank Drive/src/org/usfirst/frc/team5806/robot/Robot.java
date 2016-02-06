@@ -71,8 +71,8 @@ public class Robot extends IterativeRobot {
 	}
 
 	public void teleopInit() {
-		limitedJoyL = 0;
-		limitedJoyR = 0;
+		limitedJoyL = 0.1;
+		limitedJoyR = 0.1;
 	}
 	
 	public void teleopPeriodic() {
@@ -92,6 +92,6 @@ public class Robot extends IterativeRobot {
 		double errorR = desiredR - limitedJoyR;
 		limitedJoyL += errorL * rampCoefficient;
 		limitedJoyR += errorR * rampCoefficient;
-		//robot.tankDrive(DAMPENING_COEFFICIENT*limitedJoyL, DAMPENING_COEFFICIENT*limitedJoyR, true);
+		robot.tankDrive(DAMPENING_COEFFICIENT*limitedJoyL, DAMPENING_COEFFICIENT*limitedJoyR, true);
 	}
 }
