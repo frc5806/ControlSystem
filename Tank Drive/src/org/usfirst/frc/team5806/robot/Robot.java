@@ -1,5 +1,6 @@
 package org.usfirst.frc.team5806.robot;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
@@ -7,42 +8,18 @@ import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 public class Robot extends IterativeRobot {
-	
-	private class Button {
-		public boolean alreadyRead = false;
-		Joystick joystick;
-		private int buttonIndex;
-		
-		public Button(Joystick joystick, int buttonIndex) {
-			this.joystick = joystick;
-			this.buttonIndex = buttonIndex;
-		}
-		
-		public boolean readButton() {
-			boolean buttonValue = joystick.getRawButton(buttonIndex);
-			boolean returnValue = buttonValue == true && alreadyRead == false;
-			
-			// Set alreadyRead
-			if(buttonValue == true) alreadyRead = true;
-			else alreadyRead = false;
-			
-			return returnValue;
-		}
-	}
+	private static final double DAMPENING_COEFFICIENT = -0.75; // HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
+	private static double rampCoefficient = 0.05; // MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
+	private static double limitedJoyL, limitedJoyR;
 	
 	RobotDrive robot;
 	Joystick joystick;
 	Encoder[] encoders;
 
-	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
-	private static final double DAMPENING_COEFFICIENT = -0.75;
-	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
-	private static double rampCoefficient = 0.05;
-	
 	Button addButton;
 	Button subtractButton;
 	
-	private static double limitedJoyL, limitedJoyR;
+	Compressor compressor;
 
 	public void robotInit() {
 		robot = new RobotDrive(1, 0);
@@ -56,17 +33,16 @@ public class Robot extends IterativeRobot {
 		
 		addButton = new Button(joystick, 3);
 		subtractButton = new Button(joystick, 4);
+		
+		compressor = new Compressor(0);
 	}
-
+	
+	public void testInit() {
+	}
+	
 	public void testPeriodic() {
 		LiveWindow.run();
 		teleopPeriodic();
-	}
-
-	public void autonomousInit() {
-	}
-
-	public void autonomousPeriodic() {
 	}
 
 	public void teleopInit() {
@@ -84,7 +60,7 @@ public class Robot extends IterativeRobot {
 			System.out.println("Button: " + rampCoefficient);
 		}
 		
-		//using exponential moving averages for joystick limiting
+		// Using exponential moving averages for joystick limiting
 		double desiredL = joystick.getRawAxis(1);
 		double desiredR = joystick.getRawAxis(5);
 		double errorL = desiredL - limitedJoyL;
