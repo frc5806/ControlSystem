@@ -41,7 +41,6 @@ public class Robot extends IterativeRobot {
 	
 	Button addButton;
 	Button subtractButton;
-
 	
 	private static double limitedJoyL, limitedJoyR;
 
