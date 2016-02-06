@@ -14,17 +14,7 @@ public class Robot extends IterativeRobot {
 	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
 	private static final double DAMPENING_COEFFICIENT = -0.75;
 	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
-	private static final double MOVE_THRESHOLD = 0.05;
-	// AMOUNT BY WHICH MOTORS ARE INCREMENTED WHEN ACCELERATING
-	private static final double SPEED_RAMP_INCREMENT = 0.05;
 	private static final double RAMP_COEFFICIENT = 0.1;
-
-	private static double leftStick = 0;
-	private static double rightStick = 0;
-	private static double lsRemaining = 0;
-	private static double rsRemaining = 0;
-	private static boolean rampingLeftSpeed = false;
-	private static boolean rampingRightSpeed = false;
 	
 	private static double limitedJoyL, limitedJoyR;
 
@@ -68,62 +58,4 @@ public class Robot extends IterativeRobot {
 		limitedJoyR += errorR * RAMP_COEFFICIENT;
 		robot.tankDrive(DAMPENING_COEFFICIENT*limitedJoyL, DAMPENING_COEFFICIENT*limitedJoyR, true);
 	}
-
-	/*public void teleopPeriodic() {
-		// For Xbox Controller
-
-		// Calculate stick amounts.
-		calculateStick(true);
-		calculateStick(false);
-
-		if (lsRemaining <= 0) {
-			// have ramped all the way up to the last inputted joy value
-			rampingLeftSpeed = false;
-		}
-		if (rsRemaining <= 0) {
-			// have ramped all the way up to the last inputted joy value
-			rampingRightSpeed = false;
-		}
-
-		robot.tankDrive(DAMPENING_COEFFICIENT * leftStick, DAMPENING_COEFFICIENT * rightStick, true);
-	}
-
-	// set side to true for right side, false for left side
-	public void calculateStick(boolean side) {
-		// Set variables
-		// IF SOMEONE KNOWS HOW TO MAKE REFERENCES IN JAVA
-		// THIS FUNCTION WOULD BE MUCH NICER
-		boolean ramping = rampingLeftSpeed;
-		int joystickNum = 1;
-		double stick = leftStick;
-		if (side) {
-			ramping = rampingRightSpeed;
-			joystickNum = 5;
-			stick = rightStick;
-		}
-
-		if (ramping) {
-			if (side) {
-				rightStick += SPEED_RAMP_INCREMENT;
-				rsRemaining -= SPEED_RAMP_INCREMENT;
-			} else {
-				leftStick += SPEED_RAMP_INCREMENT;
-				lsRemaining -= SPEED_RAMP_INCREMENT;
-			}
-		} else {
-			double incoming = joystick.getRawAxis(joystickNum);
-			double desiredChange = incoming - stick;
-			if (desiredChange > MOVE_THRESHOLD || desiredChange < -MOVE_THRESHOLD) {
-				// joystick input is enough to warrant changing the motor
-				if (side) {
-					rsRemaining = desiredChange;
-					rampingRightSpeed = true;
-				} else {
-					lsRemaining = desiredChange;
-					rampingLeftSpeed = true;
-				}
-			}
-		}
-
-	}*/
 }
