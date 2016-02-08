@@ -23,9 +23,9 @@ public class Robot extends IterativeRobot {
 		public double getMM() {
 			double milivolts = getVoltage() * 1000;
 			double constant = -1;
-			for (double c : voltDistanceConstants) {
-				if (milivolts <= c) {
-					constant = c;
+			for (int i = 0; i < mvThresholds.length; i++) {
+				if (milivolts <= mvThresholds[i]) {
+					constant = voltDistanceConstants[i];
 					break;
 				}
 			}
@@ -54,6 +54,7 @@ public class Robot extends IterativeRobot {
 		//each constant is a number of mm per mV with a certain mV value
 		1.0246, 1.0239, 1.0235
 		};
+	private static final double[] mvThresholds = {4.88, 293, 4885};
 	
 	//At <= 4.88 mV, use 1.0246 mm / mV
 	//At 4.88 mV < V <= 293 mV, use 1.0239 mm / mV
