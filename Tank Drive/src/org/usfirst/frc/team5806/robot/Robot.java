@@ -11,8 +11,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class Robot extends IterativeRobot {
-	private static final double DAMPENING_COEFFICIENT = -0.75; // HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
-	private static double rampCoefficient = 0.05; // MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
+	
 	private static double limitedJoyL, limitedJoyR;
 	
 	private class Sonar extends AnalogInput {
@@ -116,7 +115,7 @@ public class Robot extends IterativeRobot {
 		
 		// Using exponential moving averages for joystick limiting
 		for (int i = 0; i < sonars.length; i++) {
-			System.out.println(sonars[i].getMM());
+			System.out.println("Sonar " + (i+1) + " Dist = " + sonars[i].getMM() + " mm");
 		}
 		
 		//using exponential moving averages for joystick limiting
