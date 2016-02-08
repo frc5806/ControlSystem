@@ -14,17 +14,43 @@ public class Robot extends IterativeRobot {
 	private static double rampCoefficient = 0.05; // MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
 	private static double limitedJoyL, limitedJoyR;
 	
+	// Driving objects
 	RobotDrive robot;
 	Joystick joystick;
+	
+	// Sensors
 	Encoder[] encoders;
 	DigitalInput magnetSwitch;
 	boolean magnetSwitched;
-
+	IMU imu;
+	
+	// Buttons for parameter tuning
 	Button addButton;
 	Button subtractButton;
 	
+	// Pneumatics object
 	Compressor compressor;
 	DoubleSolenoid solenoid;
+	
+	public int getRollerRPM(int samplePeriodMillis) {
+		int magnetCounter = 0;
+		boolean detectedLastTime = false;
+		long startingTime = System.currentTimeMillis();
+		
+		while(System.currentTimeMillis() - startingTime < samplePeriodMillis) {
+			if (magnetSwitch.get() != magnetSwitched) {
+				if(detectedLastTime == false){
+					magnetCounter++;
+					detectedLastTime = true;
+				}
+			} else {
+				detectedLastTime = false;
+			}
+		}
+		
+		return magnetCounter;
+	}
+	
 	public void robotInit() {
 		robot = new RobotDrive(1, 0);
 		joystick = new Joystick(1);
@@ -42,18 +68,20 @@ public class Robot extends IterativeRobot {
 		
 		compressor = new Compressor(0);
 		compressor.start();
+		
+		imu = new IMU();
 	}
 	
 	public void testInit() {
+		teleopInit();
 	}
 	
 	public void testPeriodic() {
 		LiveWindow.run();
 		teleopPeriodic();
-		if (magnetSwitch.get() != magnetSwitched) {
-		System.out.println("Magnet sensor: " + !magnetSwitch.get()); // has to be !magnetSwitch because it returns false if there is a magnet
-		magnetSwitched = magnetSwitch.get();
-		}
+		
+		System.out.print(imu.getRotationalDisplacement());
+		
 	}
 
 	public void teleopInit() {
