@@ -1,4 +1,4 @@
-package com.shadowh511.mayor.outputs;
+// package com.shadowh511.mayor.outputs;
 
 import edu.wpi.first.wpilibj.Solenoid;
 
