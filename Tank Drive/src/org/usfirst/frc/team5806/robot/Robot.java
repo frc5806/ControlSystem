@@ -2,6 +2,7 @@ package org.usfirst.frc.team5806.robot;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
@@ -14,12 +15,51 @@ public class Robot extends IterativeRobot {
 	private static double rampCoefficient = 0.05; // MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
 	private static double limitedJoyL, limitedJoyR;
 	
+	private class Sonar extends AnalogInput {
+		private int channel;
+		public Sonar(int c) {
+			super(c);
+			channel = c;
+		}
+		public double getMM() {
+			double milivolts = getVoltage() * 1000;
+			double constant = -1;
+			for (double c : voltDistanceConstants) {
+				if (milivolts <= c) {
+					constant = c;
+					break;
+				}
+			}
+			if (constant == -1) constant = voltDistanceConstants[voltDistanceConstants.length - 1];
+			double milimeters = milivolts * constant;
+			return milimeters;
+		}
+		public int getChannel() {
+			return channel;
+		}
+	}
+	
 	RobotDrive robot;
 	Joystick joystick;
 	Encoder[] encoders;
 	DigitalInput magnetSwitch;
 	boolean magnetSwitched;
+	Sonar[] sonars;
 
+	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
+	private static final double DAMPENING_COEFFICIENT = -0.75;
+	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
+	private static double rampCoefficient = 0.05;
+	private static final double[] voltDistanceConstants = 
+		{
+		//each constant is a number of mm per mV with a certain mV value
+		1.0246, 1.0239, 1.0235
+		};
+	
+	//At <= 4.88 mV, use 1.0246 mm / mV
+	//At 4.88 mV < V <= 293 mV, use 1.0239 mm / mV
+	//At 293 mV < V <= 4885 mV, use 1.0235 mm / mV
+	
 	Button addButton;
 	Button subtractButton;
 	
@@ -36,6 +76,9 @@ public class Robot extends IterativeRobot {
 		encoders[0].reset();
 		encoders[1] = new Encoder(2, 3);
 		encoders[1].reset();
+		
+		sonars[0] = new Sonar(8);
+		sonars[1] = new Sonar(9);
 		
 		addButton = new Button(joystick, 3);
 		subtractButton = new Button(joystick, 4);
@@ -72,6 +115,11 @@ public class Robot extends IterativeRobot {
 		}
 		
 		// Using exponential moving averages for joystick limiting
+		for (int i = 0; i < sonars.length; i++) {
+			System.out.println(sonars[i].getMM());
+		}
+		
+		//using exponential moving averages for joystick limiting
 		double desiredL = joystick.getRawAxis(1);
 		double desiredR = joystick.getRawAxis(5);
 		double errorL = desiredL - limitedJoyL;
