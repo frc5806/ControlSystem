@@ -2,7 +2,6 @@ package org.usfirst.frc.team5806.robot;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
@@ -13,31 +12,6 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 public class Robot extends IterativeRobot {
 	
 	private static double limitedJoyL, limitedJoyR;
-	
-	// Driving objects
-	private class Sonar extends AnalogInput {
-		private int channel;
-		public Sonar(int c) {
-			super(c);
-			channel = c;
-		}
-		public double getMM() {
-			double milivolts = getVoltage() * 1000;
-			double constant = -1;
-			for (int i = 0; i < mvThresholds.length; i++) {
-				if (milivolts <= mvThresholds[i]) {
-					constant = voltDistanceConstants[i];
-					break;
-				}
-			}
-			if (constant == -1) constant = voltDistanceConstants[voltDistanceConstants.length - 1];
-			double milimeters = milivolts * constant;
-			return milimeters;
-		}
-		public int getChannel() {
-			return channel;
-		}
-	}
 	
 	RobotDrive robot;
 	Joystick joystick;
@@ -55,16 +29,6 @@ public class Robot extends IterativeRobot {
 	private static final double DAMPENING_COEFFICIENT = -0.75;
 	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
 	private static double rampCoefficient = 0.05;
-	private static final double[] voltDistanceConstants = 
-		{
-		//each constant is a number of mm per mV with a certain mV value
-		1.0246, 1.0239, 1.0235
-		};
-	private static final double[] mvThresholds = {4.88, 293, 4885};
-	
-	//At <= 4.88 mV, use 1.0246 mm / mV
-	//At 4.88 mV < V <= 293 mV, use 1.0239 mm / mV
-	//At 293 mV < V <= 4885 mV, use 1.0235 mm / mV
 	
 	Button addButton;
 	Button subtractButton;
