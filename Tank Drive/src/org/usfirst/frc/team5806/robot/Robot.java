@@ -2,7 +2,6 @@ package org.usfirst.frc.team5806.robot;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
@@ -12,10 +11,6 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class Robot extends IterativeRobot {
 	private static double limitedJoyL, limitedJoyR;
-	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
-	private static final double DAMPENING_COEFFICIENT = -0.75;
-	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
-	private static double rampCoefficient = 0.05;
 	
 	// Driving objects
 	RobotDrive robot;
@@ -28,6 +23,11 @@ public class Robot extends IterativeRobot {
 
 	IMU imu;
 	Sonar[] sonars;
+
+	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
+	private static final double DAMPENING_COEFFICIENT = -0.75;
+	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
+	private static double rampCoefficient = 0.05;
 	
 	Button addButton;
 	Button subtractButton;

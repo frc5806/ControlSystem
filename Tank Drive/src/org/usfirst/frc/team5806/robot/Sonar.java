@@ -2,7 +2,7 @@ package org.usfirst.frc.team5806.robot;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 
-class Sonar extends AnalogInput {
+public class Sonar extends AnalogInput {
 	//At <= 4.88 mV, use 1.0246 mm / mV
 	//At 4.88 mV < V <= 293 mV, use 1.0239 mm / mV
 	//At 293 mV < V <= 4885 mV, use 1.0235 mm / mV
@@ -32,7 +32,6 @@ class Sonar extends AnalogInput {
 		double milimeters = milivolts * constant;
 		return milimeters;
 	}
-	
 	public int getChannel() {
 		return channel;
 	}
