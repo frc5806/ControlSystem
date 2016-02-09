@@ -27,14 +27,10 @@ public class Robot extends IterativeRobot {
 	boolean magnetSwitched;
 
 	IMU imu;
-	Sonar sonar;
+	Sonar[] sonars;
 	
 	Button addButton;
 	Button subtractButton;
-	
-	// Pneumatics object
-	Compressor compressor;
-	DoubleSolenoid solenoid;
 	
 	public float getRollerRPM(int samplePeriodMillis) {
 		int magnetCounter = 0;
@@ -70,24 +66,16 @@ public class Robot extends IterativeRobot {
 		addButton = new Button(joystick, 3);
 		subtractButton = new Button(joystick, 4);
 		
-		//compressor = new Compressor(0);
-		//compressor.start();
+		sonars = new Sonar[]{new Sonar(2), new Sonar(3)};
 	}
 	
 	public void testInit() {
 		System.out.println("Init test");
-		sonar = new Sonar(1);
 		imu = new IMU();
 	}
 	
 	public void testPeriodic() {
-		System.out.println("start");
 		LiveWindow.run();
-		//teleopPeriodic();
-		//System.out.println(!magnetSwitch.get());
-		//System.out.println("RPM: " + 30*getRollerRPM(5));
-		//System.out.println("IMU " + imu.getRotationalDisplacement());
-		System.out.println("Dist = " + sonar.getMM() + " mm");
 	}
 
 	public void teleopInit() {
