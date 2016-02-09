@@ -10,9 +10,13 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class Robot extends IterativeRobot {
-	
 	private static double limitedJoyL, limitedJoyR;
+	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
+	private static final double DAMPENING_COEFFICIENT = -0.75;
+	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
+	private static double rampCoefficient = 0.05;
 	
+	// Driving objects
 	RobotDrive robot;
 	Joystick joystick;
 	
@@ -29,6 +33,8 @@ public class Robot extends IterativeRobot {
 	private static final double DAMPENING_COEFFICIENT = -0.75;
 	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
 	private static double rampCoefficient = 0.05;
+
+	Sonar sonar;
 	
 	Button addButton;
 	Button subtractButton;
@@ -37,7 +43,7 @@ public class Robot extends IterativeRobot {
 	Compressor compressor;
 	DoubleSolenoid solenoid;
 	
-	public int getRollerRPM(int samplePeriodMillis) {
+	public float getRollerRPM(int samplePeriodMillis) {
 		int magnetCounter = 0;
 		boolean detectedLastTime = false;
 		long startingTime = System.currentTimeMillis();
@@ -53,7 +59,7 @@ public class Robot extends IterativeRobot {
 			}
 		}
 		
-		return magnetCounter;
+		return magnetCounter / (float)(samplePeriodMillis / (float)1000);
 	}
 	
 	public void robotInit() {
@@ -68,28 +74,27 @@ public class Robot extends IterativeRobot {
 		encoders[1] = new Encoder(2, 3);
 		encoders[1].reset();
 		
-		sonars[0] = new Sonar(8);
-		sonars[1] = new Sonar(9);
-		
 		addButton = new Button(joystick, 3);
 		subtractButton = new Button(joystick, 4);
 		
-		compressor = new Compressor(0);
-		compressor.start();
-		
-		imu = new IMU();
+		//compressor = new Compressor(0);
+		//compressor.start();
 	}
 	
 	public void testInit() {
-		teleopInit();
+		System.out.println("Init test");
+		sonar = new Sonar(1);
+		imu = new IMU();
 	}
 	
 	public void testPeriodic() {
+		System.out.println("start");
 		LiveWindow.run();
-		teleopPeriodic();
-		
-		System.out.print(imu.getRotationalDisplacement());
-		
+		//teleopPeriodic();
+		//System.out.println(!magnetSwitch.get());
+		//System.out.println("RPM: " + 30*getRollerRPM(5));
+		//System.out.println("IMU " + imu.getRotationalDisplacement());
+		System.out.println("Dist = " + sonar.getMM() + " mm");
 	}
 
 	public void teleopInit() {
@@ -107,11 +112,6 @@ public class Robot extends IterativeRobot {
 			System.out.println("Button: " + rampCoefficient);
 		}
 		
-		// Using exponential moving averages for joystick limiting
-		for (int i = 0; i < sonars.length; i++) {
-			System.out.println("Sonar " + (i+1) + " Dist = " + sonars[i].getMM() + " mm");
-		}
-		
 		//using exponential moving averages for joystick limiting
 		double desiredL = joystick.getRawAxis(1);
 		double desiredR = joystick.getRawAxis(5);
@@ -119,6 +119,6 @@ public class Robot extends IterativeRobot {
 		double errorR = desiredR - limitedJoyR;
 		limitedJoyL += errorL * rampCoefficient;
 		limitedJoyR += errorR * rampCoefficient;
-		robot.tankDrive(DAMPENING_COEFFICIENT*limitedJoyL, DAMPENING_COEFFICIENT*limitedJoyR, true);
+		//robot.tankDrive(DAMPENING_COEFFICIENT*limitedJoyL, DAMPENING_COEFFICIENT*limitedJoyR, true);
 	}
 }
