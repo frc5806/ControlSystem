@@ -11,10 +11,6 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class Robot extends IterativeRobot {
 	private static double limitedJoyL, limitedJoyR;
-	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
-	private static final double DAMPENING_COEFFICIENT = -0.75;
-	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
-	private static double rampCoefficient = 0.05;
 	
 	// Driving objects
 	RobotDrive robot;
