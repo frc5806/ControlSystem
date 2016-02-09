@@ -11,34 +11,13 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class Robot extends IterativeRobot {
-	
 	private static double limitedJoyL, limitedJoyR;
+	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
+	private static final double DAMPENING_COEFFICIENT = -0.75;
+	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
+	private static double rampCoefficient = 0.05;
 	
 	// Driving objects
-	private class Sonar extends AnalogInput {
-		private int channel;
-		public Sonar(int c) {
-			super(c);
-			channel = c;
-		}
-		public double getMM() {
-			double milivolts = getVoltage() * 1000;
-			double constant = -1;
-			for (int i = 0; i < mvThresholds.length; i++) {
-				if (milivolts <= mvThresholds[i]) {
-					constant = voltDistanceConstants[i];
-					break;
-				}
-			}
-			if (constant == -1) constant = voltDistanceConstants[voltDistanceConstants.length - 1];
-			double milimeters = milivolts * constant;
-			return milimeters;
-		}
-		public int getChannel() {
-			return channel;
-		}
-	}
-	
 	RobotDrive robot;
 	Joystick joystick;
 	
@@ -48,23 +27,7 @@ public class Robot extends IterativeRobot {
 	boolean magnetSwitched;
 
 	IMU imu;
-
-	Sonar[] sonars;
-
-	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
-	private static final double DAMPENING_COEFFICIENT = -0.75;
-	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
-	private static double rampCoefficient = 0.05;
-	private static final double[] voltDistanceConstants = 
-		{
-		//each constant is a number of mm per mV with a certain mV value
-		1.0246, 1.0239, 1.0235
-		};
-	private static final double[] mvThresholds = {4.88, 293, 4885};
-	
-	//At <= 4.88 mV, use 1.0246 mm / mV
-	//At 4.88 mV < V <= 293 mV, use 1.0239 mm / mV
-	//At 293 mV < V <= 4885 mV, use 1.0235 mm / mV
+	Sonar sonar;
 	
 	Button addButton;
 	Button subtractButton;
@@ -73,7 +36,7 @@ public class Robot extends IterativeRobot {
 	Compressor compressor;
 	DoubleSolenoid solenoid;
 	
-	public int getRollerRPM(int samplePeriodMillis) {
+	public float getRollerRPM(int samplePeriodMillis) {
 		int magnetCounter = 0;
 		boolean detectedLastTime = false;
 		long startingTime = System.currentTimeMillis();
@@ -89,7 +52,7 @@ public class Robot extends IterativeRobot {
 			}
 		}
 		
-		return magnetCounter;
+		return magnetCounter / (float)(samplePeriodMillis / (float)1000);
 	}
 	
 	public void robotInit() {
@@ -104,28 +67,27 @@ public class Robot extends IterativeRobot {
 		encoders[1] = new Encoder(2, 3);
 		encoders[1].reset();
 		
-		sonars[0] = new Sonar(8);
-		sonars[1] = new Sonar(9);
-		
 		addButton = new Button(joystick, 3);
 		subtractButton = new Button(joystick, 4);
 		
-		compressor = new Compressor(0);
-		compressor.start();
-		
-		imu = new IMU();
+		//compressor = new Compressor(0);
+		//compressor.start();
 	}
 	
 	public void testInit() {
-		teleopInit();
+		System.out.println("Init test");
+		sonar = new Sonar(1);
+		imu = new IMU();
 	}
 	
 	public void testPeriodic() {
+		System.out.println("start");
 		LiveWindow.run();
-		teleopPeriodic();
-		
-		System.out.print(imu.getRotationalDisplacement());
-		
+		//teleopPeriodic();
+		//System.out.println(!magnetSwitch.get());
+		//System.out.println("RPM: " + 30*getRollerRPM(5));
+		//System.out.println("IMU " + imu.getRotationalDisplacement());
+		System.out.println("Dist = " + sonar.getMM() + " mm");
 	}
 
 	public void teleopInit() {
@@ -143,11 +105,6 @@ public class Robot extends IterativeRobot {
 			System.out.println("Button: " + rampCoefficient);
 		}
 		
-		// Using exponential moving averages for joystick limiting
-		for (int i = 0; i < sonars.length; i++) {
-			System.out.println("Sonar " + (i+1) + " Dist = " + sonars[i].getMM() + " mm");
-		}
-		
 		//using exponential moving averages for joystick limiting
 		double desiredL = joystick.getRawAxis(1);
 		double desiredR = joystick.getRawAxis(5);
@@ -155,6 +112,6 @@ public class Robot extends IterativeRobot {
 		double errorR = desiredR - limitedJoyR;
 		limitedJoyL += errorL * rampCoefficient;
 		limitedJoyR += errorR * rampCoefficient;
-		robot.tankDrive(DAMPENING_COEFFICIENT*limitedJoyL, DAMPENING_COEFFICIENT*limitedJoyR, true);
+		//robot.tankDrive(DAMPENING_COEFFICIENT*limitedJoyL, DAMPENING_COEFFICIENT*limitedJoyR, true);
 	}
 }
