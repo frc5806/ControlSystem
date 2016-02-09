@@ -1,8 +1,8 @@
-import edu.wpi.first.wpilibj.Solenoid;
-
-public class Test {
-
-}
+import java.lang.Object;
+import edu.wpi.first.wpilibj.SensorBase;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.SolenoidBase;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public void forward(Compressor c, Solenoid s) {
     c.setClosedLoopControl(true);
@@ -10,11 +10,11 @@ public void forward(Compressor c, Solenoid s) {
 }
 
 public void reverse(Compressor c, Solenoid s) {
-     c.setClosedLoopControl(true);
+    c.setClosedLoopControl(true);
     s.set (DoubleSolenoid.value.kReverse);
 }
 
-public void reverse(Compressor c, Solenoid s) {
-c.setClosedLoopControl(false);
-     s.set (DoubleSolenoid.value.kOff);
+public void off(Compressor c, Solenoid s) {
+    c.setClosedLoopControl(false);
+    s.set (DoubleSolenoid.value.kOff);
 }
