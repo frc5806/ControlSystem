@@ -84,6 +84,10 @@ public class Robot extends IterativeRobot {
 			roller.stop();
 		}
 		
+		if(buttonHandler.readButton('Y')) {
+			// Add the servo control for pushing ball in
+		}
+		
 		if(buttonHandler.readButton('X')) {
 			arm.toggle();
 		}
