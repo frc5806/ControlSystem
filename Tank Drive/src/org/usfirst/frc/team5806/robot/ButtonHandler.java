@@ -8,12 +8,20 @@ public class ButtonHandler {
 		buttons = new Button[]{new Button(joystick, 1), new Button(joystick, 3), new Button(joystick, 4), new Button(joystick, 2)};
 	}
 	
-	public boolean readButton(char buttonLabel) {
-		if(buttonLabel == 'A') return buttons[0].readButton();
-		if(buttonLabel == 'X') return buttons[1].readButton();
-		if(buttonLabel == 'Y') return buttons[2].readButton();
-		if(buttonLabel == 'B') return buttons[3].readButton();
+	public Button getButtonWithTitle(char buttonLabel) {
+		if(buttonLabel == 'A') return buttons[0];
+		if(buttonLabel == 'X') return buttons[1];
+		if(buttonLabel == 'Y') return buttons[2];
+		if(buttonLabel == 'B') return buttons[3];
 		
-		return false;
+		return null;
+	}
+	
+	public boolean readButton(char buttonLabel) {
+		return getButtonWithTitle(buttonLabel).readButton();
+	}
+	
+	public boolean isDown(char buttonLabel) {
+		return getButtonWithTitle(buttonLabel).isDown();
 	}
 }

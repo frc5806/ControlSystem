@@ -76,15 +76,14 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void teleopPeriodic() {
-		if(buttonHandler.readButton('A')) {
+		if(buttonHandler.isDown('A')) {
 			roller.forward();
-		}
-		if(buttonHandler.readButton('B')) {
+		} else if(buttonHandler.isDown('B')) {
 			roller.reverse();
-		}
-		if(buttonHandler.readButton('Y')) {
+		} else {
 			roller.stop();
 		}
+		
 		if(buttonHandler.readButton('X')) {
 			arm.toggle();
 		}

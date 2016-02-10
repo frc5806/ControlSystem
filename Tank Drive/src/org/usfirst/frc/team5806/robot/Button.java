@@ -22,4 +22,8 @@ class Button {
 		
 		return returnValue;
 	}
+	
+	public boolean isDown() {
+		 return joystick.getRawButton(buttonIndex);
+	}
 }
