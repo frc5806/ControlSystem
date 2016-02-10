@@ -1,4 +1,4 @@
-// package com.shadowh511.mayor.outputs;
+package org.usfirst.frc.team5806.robot;
 
 import edu.wpi.first.wpilibj.Solenoid;
 
@@ -74,7 +74,6 @@ public class MySolenoid {
      * Gets the state of the other solenoid
      */
     public boolean getOther() {
-        boolean eggs = bar.get();
-        return eggs;
+        return this.bar.get();
     }
 }

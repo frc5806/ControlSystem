@@ -32,6 +32,23 @@ public class Robot extends IterativeRobot {
 	Button addButton;
 	Button subtractButton;
 	
+	// Pneumatics
+	Compressor compressor;
+	DoubleSolenoid solen;
+	
+	public void forward(DoubleSolenoid s) {
+	    s.set (DoubleSolenoid.Value.kForward);
+	}
+	
+	public void reverse(DoubleSolenoid s) {
+	    s.set (DoubleSolenoid.Value.kReverse);
+	}
+	
+	public void off(Compressor c, DoubleSolenoid s) {
+	    c.stop();
+	    s.set (DoubleSolenoid.Value.kOff);
+	}
+	
 	public float getRollerRPM(int samplePeriodMillis) {
 		int magnetCounter = 0;
 		boolean detectedLastTime = false;
@@ -63,10 +80,15 @@ public class Robot extends IterativeRobot {
 		encoders[1] = new Encoder(2, 3);
 		encoders[1].reset();
 		
-		addButton = new Button(joystick, 3);
-		subtractButton = new Button(joystick, 4);
+		addButton = new Button(joystick, 1);
+		subtractButton = new Button(joystick, 2);
 		
 		sonars = new Sonar[]{new Sonar(2), new Sonar(3)};
+		
+		compressor = new Compressor();
+		compressor.start();
+		
+		solen = new DoubleSolenoid(0,1);
 	}
 	
 	public void testInit() {
@@ -81,16 +103,22 @@ public class Robot extends IterativeRobot {
 	public void teleopInit() {
 		limitedJoyL = 0.1;
 		limitedJoyR = 0.1;
+		LiveWindow.run();
+		solen.startLiveWindowMode();
 	}
 	
 	public void teleopPeriodic() {
 		if(addButton.readButton()) {
-			rampCoefficient += 0.01;
-			System.out.println("Button: " + rampCoefficient);
+			//rampCoefficient += 0.01;
+			//System.out.println("Button: " + rampCoefficient);
+			System.out.println("Fired forwards");
+			forward(solen);
 		}
 		if(subtractButton.readButton()) {
-			rampCoefficient -= 0.01;
-			System.out.println("Button: " + rampCoefficient);
+			//rampCoefficient -= 0.01;
+			//System.out.println("Button: " + rampCoefficient);
+			System.out.println("Fired reverse");
+			reverse(solen);
 		}
 		
 		//using exponential moving averages for joystick limiting
@@ -101,5 +129,9 @@ public class Robot extends IterativeRobot {
 		limitedJoyL += errorL * rampCoefficient;
 		limitedJoyR += errorR * rampCoefficient;
 		//robot.tankDrive(DAMPENING_COEFFICIENT*limitedJoyL, DAMPENING_COEFFICIENT*limitedJoyR, true);
+	}
+	
+	public void disableInit() {
+		off(compressor, solen);
 	}
 }
