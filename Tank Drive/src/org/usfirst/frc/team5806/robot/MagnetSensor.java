@@ -32,8 +32,8 @@ public class MagnetSensor {
 		@Override
 		public void run() {
 			while(true) {
-				rpm = getRollerRPM(1000);
-				//SmartDashboard.putNumber("RPM: ", rpm);
+				rpm = getRollerRPM(100);
+				SmartDashboard.putNumber("RPM: ", rpm);
 			}
 		}
 		

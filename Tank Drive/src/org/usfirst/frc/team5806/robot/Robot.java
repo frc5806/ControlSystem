@@ -19,19 +19,18 @@ public class Robot extends IterativeRobot {
 	
 	// Sensors
 	Encoder[] encoders;
-
 	IMU imu;
 	Sonar[] sonars;
 
 	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
-	private static final double DAMPENING_COEFFICIENT = -0.75;
+	private static final double DAMPENING_COEFFICIENT = -0.9;
 	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
-	private static double rampCoefficient = 0.05;
+	private static double rampCoefficient = 0.07;
 	
 	ButtonHandler buttonHandler;
 	
 	// Pneumatics
-	Compressor compressor;
+	//Compressor compressor;
 	DoubleSolenoid solen;
 	
 	Roller roller;
@@ -51,8 +50,8 @@ public class Robot extends IterativeRobot {
 		
 		buttonHandler = new ButtonHandler(joystick);
 		
-		compressor = new Compressor();
-		compressor.start();
+		//compressor = new Compressor();
+		//compressor.start();
 		
 		roller = new Roller(2, 4);
 		arm = new Arm(1, 0);
@@ -90,7 +89,7 @@ public class Robot extends IterativeRobot {
 			arm.toggle();
 		}
 		
-		System.out.println("RPM: " + roller.getRPM());
+		System.out.println("Sonars: " + sonars[0].getMM() + " " + sonars[1].getMM());
 		
 		//using exponential moving averages for joystick limiting
 		double desiredL = joystick.getRawAxis(1);
@@ -99,12 +98,12 @@ public class Robot extends IterativeRobot {
 		double errorR = desiredR - limitedJoyR;
 		limitedJoyL += errorL * rampCoefficient;
 		limitedJoyR += errorR * rampCoefficient;
-		//robot.tankDrive(DAMPENING_COEFFICIENT*limitedJoyL, DAMPENING_COEFFICIENT*limitedJoyR, true);
+		robot.tankDrive(DAMPENING_COEFFICIENT*limitedJoyL, DAMPENING_COEFFICIENT*limitedJoyR, true);
 		
 		roller.update();
 	}
 	
 	public void disableInit() {
-		compressor.stop();
+		//compressor.stop();
 	}
 }
