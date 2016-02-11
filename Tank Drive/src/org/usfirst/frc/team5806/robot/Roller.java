@@ -4,10 +4,13 @@ import edu.wpi.first.wpilibj.Talon;
 
 public class Roller {
 	Talon motorController;
+	MagnetSensor encoder;
 	float speed;
-	public Roller(int talonChannel, int magneticSensor) {
+	
+	public Roller(int talonChannel, int magneticChannel) {
 		motorController = new Talon(talonChannel);
-		
+		encoder = new MagnetSensor(magneticChannel);
+
 		speed = 0;
 	}
 	
@@ -26,4 +29,9 @@ public class Roller {
 	public void update() {
 		motorController.set(speed);
 	}
+	
+	public float getRPM() {
+		return encoder.getRPM();
+	}
 }
+ 

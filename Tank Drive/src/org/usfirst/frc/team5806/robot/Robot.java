@@ -22,7 +22,6 @@ public class Robot extends IterativeRobot {
 
 	IMU imu;
 	Sonar[] sonars;
-	MagnetSensor magnet;
 
 	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
 	private static final double DAMPENING_COEFFICIENT = -0.75;
@@ -49,14 +48,13 @@ public class Robot extends IterativeRobot {
 		encoders[1].reset();
 		
 		sonars = new Sonar[]{new Sonar(2), new Sonar(3)};
-		magnet = new MagnetSensor(4);
 		
 		buttonHandler = new ButtonHandler(joystick);
 		
 		compressor = new Compressor();
 		compressor.start();
 		
-		roller = new Roller(2, -1);
+		roller = new Roller(2, 4);
 		arm = new Arm(1, 0);
 	}
 	
@@ -92,7 +90,7 @@ public class Robot extends IterativeRobot {
 			arm.toggle();
 		}
 		
-		System.out.println("RPM: " + magnet.getRPM());
+		System.out.println("RPM: " + roller.getRPM());
 		
 		//using exponential moving averages for joystick limiting
 		double desiredL = joystick.getRawAxis(1);
