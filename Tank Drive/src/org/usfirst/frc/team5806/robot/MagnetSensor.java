@@ -1,7 +1,6 @@
 package org.usfirst.frc.team5806.robot;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class MagnetSensor {
 	float rpm;
@@ -33,7 +32,6 @@ public class MagnetSensor {
 		public void run() {
 			while(true) {
 				rpm = getRollerRPM(100);
-				SmartDashboard.putNumber("RPM: ", rpm);
 			}
 		}
 		

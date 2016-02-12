@@ -7,14 +7,10 @@ public class IMU {
 	
 	public IMU() {
 		System.out.println("Going to start");
-		try {
-			serial = new SerialPort(57600, SerialPort.Port.kOnboard);
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
+		serial = new SerialPort(57600, SerialPort.Port.kOnboard);
 	}
 	
 	public String getRotationalDisplacement() {
-		return serial.readString(1);
+		return ""+serial.getBytesReceived();
 	}
 }
