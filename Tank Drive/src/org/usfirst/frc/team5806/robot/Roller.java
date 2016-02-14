@@ -1,6 +1,7 @@
 package org.usfirst.frc.team5806.robot;
 
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.command.PIDSubsystem;
 
 public class Roller extends PIDSubsystem {
 	private static final int SAMPLE_PERIOD_MILLIS = 100;

@@ -1,17 +1,13 @@
 package org.usfirst.frc.team5806.robot;
 
-import java.nio.ByteBuffer;
 
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Encoder;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.vision.USBCamera;
 
 public class Robot extends IterativeRobot {
 
@@ -22,12 +18,10 @@ public class Robot extends IterativeRobot {
 	Joystick joystick;
 
 	// Sensors
-	Encoder[] encoders;
 	IMU imu;
 	Sonar[] sonars;
 
 	CameraServer cameraServer;
-	USBCamera camera;
 
 	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
 	private static final double DAMPENING_COEFFICIENT = -0.9;
@@ -41,14 +35,11 @@ public class Robot extends IterativeRobot {
 
 	public void robotInit() {
 		leftDrive = new DriveTrain(new Talon(1), new Encoder(0, 1), 0);
-		rightDrive = new DriveTrain(new Talon(0), new Encoder(0, 1), 0);
+		rightDrive = new DriveTrain(new Talon(0), new Encoder(2, 3), 0);
+		leftDrive.enable();
+		rightDrive.enable();
+		
 		joystick = new Joystick(1);
-
-		encoders = new Encoder[2];
-		encoders[0] = new Encoder(0, 1);
-		encoders[0].reset();
-		encoders[1] = new Encoder(2, 3);
-		encoders[1].reset();
 
 		sonars = new Sonar[] { new Sonar(2), new Sonar(3) };
 		
@@ -99,10 +90,9 @@ public class Robot extends IterativeRobot {
 		double errorR = desiredR - limitedJoyR;
 		limitedJoyL += errorL * rampCoefficient;
 		limitedJoyR += errorR * rampCoefficient;
-		leftDrive.setSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * DAMPENING_COEFFICIENT * limitedJoyL);
-		rightDrive.setSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * DAMPENING_COEFFICIENT * limitedJoyR);
-
-		roller.update();
+		//System.out.println("Speed: " + leftDrive.lastMotorSpeed);
+		leftDrive.setSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredL * 0.2);
+		rightDrive.setSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredR * 0.2);
 
 		// Update dashboard
 		

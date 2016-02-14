@@ -1,7 +1,6 @@
 package org.usfirst.frc.team5806.robot;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
 
@@ -13,15 +12,20 @@ public class DriveTrain extends PIDSubsystem {
 	Encoder encoder;
 	
 	double targetEncoderSpeed;
-	double lastMotorSpeed;
+	public double lastMotorSpeed;
 	
 	public DriveTrain(Talon motorController, Encoder encoder, int startingEncoderSpeed) {
 		super("DriveTrain", 1, 0, 0);
+		
+		setAbsoluteTolerance(0.1);
+		getPIDController().setContinuous(false);
+		setInputRange(-MAXIMUM_ENCODERS_PER_SECOND, MAXIMUM_ENCODERS_PER_SECOND);
 		
 		this.motorController = motorController;
 		this.encoder = encoder;
 		this.targetEncoderSpeed = startingEncoderSpeed;
 		this.lastMotorSpeed = 0;
+		
 	}
 	
 	@Override
@@ -39,15 +43,14 @@ public class DriveTrain extends PIDSubsystem {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		int encoderSpeed = (int) (encoder.get() - currentEncoderTicks) / (1000 / SAMPLE_PERIOD_MILLIS);
-		
+		float encoderSpeed = (float)(encoder.get() - currentEncoderTicks) / (float)(SAMPLE_PERIOD_MILLIS / 1000.0f);
 		return targetEncoderSpeed - encoderSpeed;
 	}
 
 	@Override
 	protected void usePIDOutput(double output) {
-		lastMotorSpeed += output / MAXIMUM_ENCODERS_PER_SECOND;
-		motorController.set(lastMotorSpeed);
+		//System.out.println("output: " + output);
+		motorController.pidWrite(output* 0.2);
 	}
 
 }
