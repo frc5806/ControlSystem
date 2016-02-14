@@ -2,57 +2,52 @@ package org.usfirst.frc.team5806.robot;
 
 import edu.wpi.first.wpilibj.Talon;
 
-public class Roller {
+public class Roller extends PIDSubsystem {
+	private static final int SAMPLE_PERIOD_MILLIS = 100;
+	public static final int MAXIMUM_RPM = 40000;
+
 	Talon motorController;
 	MagnetSensor encoder;
-	float speed;
-	float speedRange;
-	float lastRPM;
+
+	boolean isForwards;
+	float lastMotorSpeed;
 	float targetRPM;
 	
 	public Roller(int talonChannel, int magneticChannel) {
+		super("Roller", 1, 0, 0);
+
 		motorController = new Talon(talonChannel);
 		encoder = new MagnetSensor(magneticChannel);
 
-		speed = 0;
-		targetRPM = 0;
+		stop();
 	}
 	
 	public void forward() {
-		setRPM(3600, true);
+		targetRPM = 3600;
+		isForwards = true;
 	}
 	
 	public void reverse() {
-		setRPM(1800, false);
+		targetRPM = 1800;
+		isForwards = false;
 	}
 	
 	public void stop() {
 		targetRPM = 0;
 	}
+
+	@Override
+	protected void initDefaultCommand() {}
 	
-	public void update() {
-		float rpm = getRPM();
-		if(rpm != lastRPM) {
-			speedRange /= 2.0f;
-			boolean isSlow = rpm < targetRPM;
-			boolean isForwards = speed > 0;
-			float speedIncrement = (isForwards && isSlow) || (!isForwards && !isSlow) ? speedRange : -speedRange;
-			
-			speed += speedIncrement;
-			lastRPM = rpm;
-		}
-			
-		motorController.set(speed);
+	@Override
+	protected double returnPIDInput() {
+		return targetRPM - encoder.getRPM(SAMPLE_PERIOD_MILLIS);
 	}
-	
-	private void setRPM(float rpm, boolean isForwards) {
-		targetRPM = rpm;
-		speed = isForwards ? 50 : -50;
-		speedRange = 1;
-	}
-	
-	public float getRPM() {
-		return encoder.getRPM();
+
+	@Override
+	protected void usePIDOutput(double output) {
+		lastMotorSpeed += (output / MAXIMUM_RPM)*(isForwards ? 1 : -1);
+		motorController.set(lastMotorSpeed);
 	}
 }
  
