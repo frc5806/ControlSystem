@@ -16,7 +16,7 @@ public class DriveTrain extends PIDSubsystem {
 	double lastMotorSpeed;
 	
 	public DriveTrain(Talon motorController, Encoder encoder, int startingEncoderSpeed) {
-		super("DriveTrin", 1, 0, 0);
+		super("DriveTrain", 1, 0, 0);
 		
 		this.motorController = motorController;
 		this.encoder = encoder;
