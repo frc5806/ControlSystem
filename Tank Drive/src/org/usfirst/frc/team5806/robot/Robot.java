@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot {
 
@@ -21,10 +22,11 @@ public class Robot extends IterativeRobot {
 	IMU imu;
 	Sonar[] sonars;
 
+	Camera camera;
 	CameraServer cameraServer;
 
 	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
-	private static final double DAMPENING_COEFFICIENT = -0.9;
+	//unused: private static final double DAMPENING_COEFFICIENT = -0.9;
 	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
 	private static double rampCoefficient = 0.07;
 	private static final String CAMERA_NAME = "cam0";
@@ -44,6 +46,7 @@ public class Robot extends IterativeRobot {
 		sonars = new Sonar[] { new Sonar(2), new Sonar(3) };
 		
 		cameraServer = CameraServer.getInstance();
+		camera = new Camera(CAMERA_NAME);
 
 		buttonHandler = new ButtonHandler(joystick);
 
@@ -67,7 +70,7 @@ public class Robot extends IterativeRobot {
 	public void teleopInit() {
 		limitedJoyL = 0.1;
 		limitedJoyR = 0.1;
-		cameraServer.startAutomaticCapture(CAMERA_NAME);
+		cameraServer.startAutomaticCapture(camera);
 	}
 
 	public void teleopPeriodic() {
@@ -95,7 +98,13 @@ public class Robot extends IterativeRobot {
 		rightDrive.setSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredR * 0.2);
 
 		// Update dashboard
-		
+		for (int index = 0; index < 4; index++)
+		if (camera.contoursExist(index)) {
+		SmartDashboard.putNumber("Contour " + index+1 +": X", camera.getContourX(index));
+		SmartDashboard.putNumber("Contour " + index+1 +": Y", camera.getContourY(index));
+		SmartDashboard.putNumber("Contour " + index+1 +": Height", camera.getContourHeight(index));
+		SmartDashboard.putNumber("Contour " + index+1 +": Width", camera.getContourWidth(index));
+		} else {break;}
 	}
 
 	public void disableInit() {
