@@ -18,7 +18,7 @@ public class DriveTrain extends PIDSubsystem {
 	public DriveTrain(Talon motorController, Encoder encoder, int startingEncoderSpeed) {
 		super("DriveTrain", 1, 0, 0);
 		
-		setAbsoluteTolerance(0.1);
+		setAbsoluteTolerance(0.05);
 		getPIDController().setContinuous(false);
 		
 		this.motorController = motorController;
@@ -32,6 +32,9 @@ public class DriveTrain extends PIDSubsystem {
 	protected void initDefaultCommand() {}
 	
 	public void setSpeed(double targetEncoderSpeed) {
+		if(targetEncoderSpeed > MAXIMUM_ENCODERS_PER_SECOND) targetEncoderSpeed = MAXIMUM_ENCODERS_PER_SECOND;
+		if(targetEncoderSpeed < -MAXIMUM_ENCODERS_PER_SECOND) targetEncoderSpeed = -MAXIMUM_ENCODERS_PER_SECOND;
+		
 		this.targetEncoderSpeed = targetEncoderSpeed;
 	}
 	
