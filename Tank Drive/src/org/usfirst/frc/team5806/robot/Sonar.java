@@ -11,6 +11,7 @@ public class Sonar extends AnalogInput {
 		//each constant is a number of mm per mV with a certain mV value
 		1.0246, 1.0239, 1.0235
 	};
+	private static final double FT_PER_MM = 0.00328084;
 	
 	private int channel;
 	
@@ -31,6 +32,9 @@ public class Sonar extends AnalogInput {
 		if (constant == -1) constant = voltDistanceConstants[voltDistanceConstants.length - 1];
 		double milimeters = milivolts * constant;
 		return milimeters;
+	}
+	public double getFeet() {
+		return getMM() * FT_PER_MM;
 	}
 	public int getChannel() {
 		return channel;

@@ -36,11 +36,40 @@ public class Robot extends IterativeRobot {
 	CameraServer cameraServer;
 	GoalFinder finder;
 
+	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
+	//unused: private static final double DAMPENING_COEFFICIENT = -0.9;
+	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
+	private static double rampCoefficient = 0.07;
+	private static final String CAMERA_NAME = "cam0";
+	private static final double[] SHOOTING_RANGE_FEET = {3.75, 4.25};
+	private static final double[] GOAL_CENTERED_COORDS = {500, 500};
+	private static final double GOAL_CENTERED_ERROR = 10;
+
 	ButtonHandler buttonHandler;
 	Roller roller;
 	Arm arm;
 
-	public void robotInit() {				
+
+	public boolean inShootingRange() {
+		//assuming the robot is facing 90 deg toward wall
+		double feetFromWall = sonars[0].getFeet();
+		double[][] centerGuesses = goalFinder.getGoalCenters();
+		double minDist = Double.MAX_VALUE;
+		for (int i = 0; i < centerGuesses.length; i++) {
+			double[] coords = centerGuesses[i];
+			double distSq = Math.pow(GOAL_CENTERED_COORDS[0] - coords[0], 2) + 
+							Math.pow(GOAL_CENTERED_COORDS[1] - coords[1], 2);
+			double dist = Math.sqrt(distSq);
+			if (dist < minDist) {
+				minDist = dist;
+			}
+		}
+		return feetFromWall >= SHOOTING_RANGE_FEET[0]
+			&& feetFromWall <= SHOOTING_RANGE_FEET[1]
+			&& minDist <= GOAL_CENTERED_ERROR;
+	}
+	
+	public void robotInit() {
 		joystick = new Joystick(1);
 
 		sonars = new Sonar[] { new Sonar(2), new Sonar(3) };
@@ -50,7 +79,7 @@ public class Robot extends IterativeRobot {
 		finder = new GoalFinder(); 
 
 		buttonHandler = new ButtonHandler(joystick);
-
+		
 		// compressor = new Compressor();
 		// compressor.start();
 
