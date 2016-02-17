@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.Encoder;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -40,7 +41,7 @@ public class Robot extends IterativeRobot {
 		rightDrive = new DriveTrain(new Talon(0), new Encoder(2, 3), 0);
 		leftDrive.enable();
 		rightDrive.enable();
-		
+				
 		joystick = new Joystick(1);
 
 		sonars = new Sonar[] { new Sonar(2), new Sonar(3) };
@@ -88,23 +89,26 @@ public class Robot extends IterativeRobot {
 		
 		// using exponential moving averages for joystick limiting
 		double desiredL = joystick.getRawAxis(1);
-		double desiredR = joystick.getRawAxis(5);
+		double desiredR = -joystick.getRawAxis(5);
 		double errorL = desiredL - limitedJoyL;
 		double errorR = desiredR - limitedJoyR;
 		limitedJoyL += errorL * rampCoefficient;
 		limitedJoyR += errorR * rampCoefficient;
 		//System.out.println("Speed: " + leftDrive.lastMotorSpeed);
-		leftDrive.setSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredL * 0.2);
-		rightDrive.setSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredR * 0.2);
+		leftDrive.setSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredL);
+		rightDrive.setSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredR);
 
 		// Update dashboard
-		for (int index = 0; index < 4; index++)
-		if (camera.contoursExist(index)) {
-		SmartDashboard.putNumber("Contour " + index+1 +": X", camera.getContourX(index));
-		SmartDashboard.putNumber("Contour " + index+1 +": Y", camera.getContourY(index));
-		SmartDashboard.putNumber("Contour " + index+1 +": Height", camera.getContourHeight(index));
-		SmartDashboard.putNumber("Contour " + index+1 +": Width", camera.getContourWidth(index));
-		} else {break;}
+		for (int index = 0; index < 4; index++) {
+			if (camera.contoursExist(index)) {
+				SmartDashboard.putNumber("Contour " + index+1 +": X", camera.getContourX(index));
+				SmartDashboard.putNumber("Contour " + index+1 +": Y", camera.getContourY(index));
+				SmartDashboard.putNumber("Contour " + index+1 +": Height", camera.getContourHeight(index));
+				SmartDashboard.putNumber("Contour " + index+1 +": Width", camera.getContourWidth(index));
+			} else {
+				break;
+			}
+		}
 	}
 
 	public void disableInit() {

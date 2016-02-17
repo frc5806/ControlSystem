@@ -3,13 +3,14 @@ package org.usfirst.frc.team5806.robot;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveTrain extends PIDSubsystem {
 	private static final int SAMPLE_PERIOD_MILLIS = 100;
-	public static final int MAXIMUM_ENCODERS_PER_SECOND = 10000;
+	public static final int MAXIMUM_ENCODERS_PER_SECOND = 100000;
 	
-	Talon motorController;
-	Encoder encoder;
+	public Talon motorController;
+	public Encoder encoder;
 	
 	double targetEncoderSpeed;
 	public double lastMotorSpeed;
@@ -19,7 +20,6 @@ public class DriveTrain extends PIDSubsystem {
 		
 		setAbsoluteTolerance(0.1);
 		getPIDController().setContinuous(false);
-		setInputRange(-MAXIMUM_ENCODERS_PER_SECOND, MAXIMUM_ENCODERS_PER_SECOND);
 		
 		this.motorController = motorController;
 		this.encoder = encoder;
@@ -44,13 +44,15 @@ public class DriveTrain extends PIDSubsystem {
 			e.printStackTrace();
 		}
 		float encoderSpeed = (float)(encoder.get() - currentEncoderTicks) / (float)(SAMPLE_PERIOD_MILLIS / 1000.0f);
-		return targetEncoderSpeed - encoderSpeed;
+		SmartDashboard.putNumber("Speed", encoderSpeed);
+		return (targetEncoderSpeed - encoderSpeed) / MAXIMUM_ENCODERS_PER_SECOND;
 	}
 
 	@Override
 	protected void usePIDOutput(double output) {
-		//System.out.println("output: " + output);
-		motorController.pidWrite(output* 0.2);
+		SmartDashboard.putNumber("PID output", output);
+		//motorController.set(0.0f);
+		motorController.pidWrite(output);
 	}
 
 }
