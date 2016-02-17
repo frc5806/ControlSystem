@@ -5,7 +5,8 @@ import edu.wpi.first.wpilibj.command.PIDSubsystem;
 
 public class Roller extends PIDSubsystem {
 	private static final int SAMPLE_PERIOD_MILLIS = 100;
-	public static final int MAXIMUM_RPM = 40000;
+	public static final int MAXIMUM_RPM = 1000;
+	private static final int TIME_TO_FULL_SPEED_MILLIS = 10000;
 
 	Talon motorController;
 	MagnetSensor encoder;
@@ -13,6 +14,8 @@ public class Roller extends PIDSubsystem {
 	boolean isForwards;
 	float lastMotorSpeed;
 	float targetRPM;
+	float currentTargetSpeed;
+	long startingMillis;
 	
 	public Roller(int talonChannel, int magneticChannel) {
 		super("Roller", 1, 0, 0);
@@ -24,17 +27,23 @@ public class Roller extends PIDSubsystem {
 	}
 	
 	public void forward() {
-		targetRPM = 3600;
-		isForwards = true;
+		setTargetSpeed(1000);
+		
 	}
 	
 	public void reverse() {
-		targetRPM = 1800;
-		isForwards = false;
+		setTargetSpeed(-500);
 	}
 	
 	public void stop() {
-		targetRPM = 0;
+		setTargetSpeed(0);
+	}
+	
+	private void setTargetSpeed(double speed) {
+		targetRPM = (float) Math.abs(speed);
+		isForwards = speed > 0;
+		currentTargetSpeed = 0;
+		startingMillis = System.currentTimeMillis();
 	}
 
 	@Override
@@ -42,13 +51,14 @@ public class Roller extends PIDSubsystem {
 	
 	@Override
 	protected double returnPIDInput() {
-		return targetRPM - encoder.getRPM(SAMPLE_PERIOD_MILLIS);
+		long millisSince = System.currentTimeMillis() - startingMillis;
+		currentTargetSpeed = (millisSince / TIME_TO_FULL_SPEED_MILLIS) * targetRPM;
+		return (targetRPM - encoder.getRPM(SAMPLE_PERIOD_MILLIS)) / MAXIMUM_RPM;
 	}
 
 	@Override
 	protected void usePIDOutput(double output) {
-		lastMotorSpeed += (output / MAXIMUM_RPM)*(isForwards ? 1 : -1);
-		motorController.set(lastMotorSpeed);
+		motorController.pidWrite(output*0.2);
 	}
 }
  
