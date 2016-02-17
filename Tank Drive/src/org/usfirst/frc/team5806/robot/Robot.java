@@ -2,6 +2,7 @@ package org.usfirst.frc.team5806.robot;
 
 
 import edu.wpi.first.wpilibj.CameraServer;
+
 import edu.wpi.first.wpilibj.Encoder;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -10,6 +11,7 @@ import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.vision.USBCamera;
 
 public class Robot extends IterativeRobot {
 
@@ -23,7 +25,7 @@ public class Robot extends IterativeRobot {
 	IMU imu;
 	Sonar[] sonars;
 
-	Camera camera;
+	USBCamera camera;
 	CameraServer cameraServer;
 
 	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
@@ -47,25 +49,23 @@ public class Robot extends IterativeRobot {
 		sonars = new Sonar[] { new Sonar(2), new Sonar(3) };
 		
 		cameraServer = CameraServer.getInstance();
-		camera = new Camera(CAMERA_NAME);
+		camera = new USBCamera(CAMERA_NAME);
 
 		buttonHandler = new ButtonHandler(joystick);
 
 		// compressor = new Compressor();
 		// compressor.start();
 
-		roller = new Roller(2, 4);
+		//roller = new Roller(2, 4);
 		arm = new Arm(1, 0);
 	}
-
-	public void testInit() {
-		LiveWindow.run();
-		teleopInit();
+	
+	public void autonomousInit() {
+		
 	}
-
-	public void testPeriodic() {
-		LiveWindow.run();
-		teleopPeriodic();
+	
+	public void autonomousPeriodic() {
+		
 	}
 
 	public void teleopInit() {
@@ -76,15 +76,15 @@ public class Robot extends IterativeRobot {
 
 	public void teleopPeriodic() {
 		if (buttonHandler.isDown('A')) {
-			roller.forward();
+			//roller.forward();
 		} else if (buttonHandler.isDown('B')) {
-			roller.reverse();
+			//roller.reverse();
 		} else {
-			roller.stop();
+			//roller.stop();
 		}
 
 		if (buttonHandler.readButton('X')) {
-			arm.toggle();
+			//arm.toggle();
 		}
 		
 		// using exponential moving averages for joystick limiting
@@ -112,6 +112,6 @@ public class Robot extends IterativeRobot {
 	}
 
 	public void disableInit() {
-		// compressor.stop();
+		//compressor.stop();
 	}
 }
