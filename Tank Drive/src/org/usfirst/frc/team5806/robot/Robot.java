@@ -27,17 +27,40 @@ public class Robot extends IterativeRobot {
 
 	USBCamera camera;
 	CameraServer cameraServer;
+	GoalFinder goalFinder;
 
 	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
 	//unused: private static final double DAMPENING_COEFFICIENT = -0.9;
 	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
 	private static double rampCoefficient = 0.07;
 	private static final String CAMERA_NAME = "cam0";
+	private static final double[] SHOOTING_RANGE_FEET = {3.75, 4.25};
+	private static final double[] GOAL_CENTERED_COORDS = {500, 500};
+	private static final double GOAL_CENTERED_ERROR = 10;
 
 	ButtonHandler buttonHandler;
 	Roller roller;
 	Arm arm;
-
+	
+	public boolean inShootingRange() {
+		//assuming the robot is facing 90 deg toward wall
+		double feetFromWall = sonars[0].getFeet();
+		double[][] centerGuesses = goalFinder.getGoalCenters();
+		double minDist = Double.MAX_VALUE;
+		for (int i = 0; i < centerGuesses.length; i++) {
+			double[] coords = centerGuesses[i];
+			double distSq = Math.pow(GOAL_CENTERED_COORDS[0] - coords[0], 2) + 
+							Math.pow(GOAL_CENTERED_COORDS[1] - coords[1], 2);
+			double dist = Math.sqrt(distSq);
+			if (dist < minDist) {
+				minDist = dist;
+			}
+		}
+		return feetFromWall >= SHOOTING_RANGE_FEET[0]
+			&& feetFromWall <= SHOOTING_RANGE_FEET[1]
+			&& minDist <= GOAL_CENTERED_ERROR;
+	}
+	
 	public void robotInit() {
 		leftDrive = new DriveTrain(new Talon(1), new Encoder(0, 1), 0);
 		rightDrive = new DriveTrain(new Talon(0), new Encoder(2, 3), 0);
@@ -52,6 +75,8 @@ public class Robot extends IterativeRobot {
 		camera = new USBCamera(CAMERA_NAME);
 
 		buttonHandler = new ButtonHandler(joystick);
+		
+		goalFinder = new GoalFinder();
 
 		// compressor = new Compressor();
 		// compressor.start();
@@ -109,6 +134,8 @@ public class Robot extends IterativeRobot {
 				break;
 			}
 		}
+		SmartDashboard.putBoolean("In Shooting Range: ", inShootingRange());
+		
 	}
 
 	public void disableInit() {
