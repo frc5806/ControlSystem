@@ -13,7 +13,6 @@ public class DriveTrain extends PIDSubsystem {
 	public Encoder encoder;
 	
 	double targetEncoderSpeed;
-	public double lastMotorSpeed;
 	
 	public DriveTrain(Talon motorController, Encoder encoder, int startingEncoderSpeed) {
 		super("DriveTrain", 1, 0, 0);
@@ -24,12 +23,7 @@ public class DriveTrain extends PIDSubsystem {
 		this.motorController = motorController;
 		this.encoder = encoder;
 		this.targetEncoderSpeed = startingEncoderSpeed;
-		this.lastMotorSpeed = 0;
-		
 	}
-	
-	@Override
-	protected void initDefaultCommand() {}
 	
 	public void setSpeed(double targetEncoderSpeed) {
 		if(targetEncoderSpeed > MAXIMUM_ENCODERS_PER_SECOND) targetEncoderSpeed = MAXIMUM_ENCODERS_PER_SECOND;
@@ -37,6 +31,24 @@ public class DriveTrain extends PIDSubsystem {
 		
 		this.targetEncoderSpeed = targetEncoderSpeed;
 	}
+	
+	public void moveEncoderTicks(long encoderTicks, double speed) {
+		long startingTicks = encoder.get();
+		setSpeed(speed);
+		while(encoder.get() - startingTicks < encoderTicks) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				System.out.println("Could not sleep while moving encoder ticks");
+				e.printStackTrace();
+			}
+		}
+		setSpeed(0.0f);
+	}
+	
+	@Override
+	protected void initDefaultCommand() {}
 	
 	@Override
 	protected double returnPIDInput() {
@@ -54,7 +66,6 @@ public class DriveTrain extends PIDSubsystem {
 	@Override
 	protected void usePIDOutput(double output) {
 		SmartDashboard.putNumber("PID output", output);
-		//motorController.set(0.0f);
 		motorController.pidWrite(output);
 	}
 

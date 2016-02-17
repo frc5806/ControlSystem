@@ -1,6 +1,9 @@
 package org.usfirst.frc.team5806.robot;
 
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import edu.wpi.first.wpilibj.CameraServer;
 
 import edu.wpi.first.wpilibj.Encoder;
@@ -14,11 +17,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.vision.USBCamera;
 
 public class Robot extends IterativeRobot {
-
+	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
+	//unused: private static final double DAMPENING_COEFFICIENT = -0.9;
+	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
+	private static double rampCoefficient = 0.07;
+	private static final String CAMERA_NAME = "cam0";
+	
 	private static double limitedJoyL, limitedJoyR;
 
 	// Driving objects
-	DriveTrain leftDrive, rightDrive;
 	Joystick joystick;
 
 	// Sensors
@@ -27,29 +34,20 @@ public class Robot extends IterativeRobot {
 
 	USBCamera camera;
 	CameraServer cameraServer;
-
-	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
-	//unused: private static final double DAMPENING_COEFFICIENT = -0.9;
-	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
-	private static double rampCoefficient = 0.07;
-	private static final String CAMERA_NAME = "cam0";
+	GoalFinder finder;
 
 	ButtonHandler buttonHandler;
 	Roller roller;
 	Arm arm;
 
-	public void robotInit() {
-		leftDrive = new DriveTrain(new Talon(1), new Encoder(0, 1), 0);
-		rightDrive = new DriveTrain(new Talon(0), new Encoder(2, 3), 0);
-		leftDrive.enable();
-		rightDrive.enable();
-				
+	public void robotInit() {				
 		joystick = new Joystick(1);
 
 		sonars = new Sonar[] { new Sonar(2), new Sonar(3) };
 		
 		cameraServer = CameraServer.getInstance();
 		camera = new USBCamera(CAMERA_NAME);
+		finder = new GoalFinder(); 
 
 		buttonHandler = new ButtonHandler(joystick);
 
@@ -64,7 +62,60 @@ public class Robot extends IterativeRobot {
 		
 	}
 	
+	public void sleep(int millis) {
+		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public void autonomousPeriodic() {
+		// Move to the low goal
+		leftDrive.setSpeed(0.5);
+		rightDrive.setSpeed(0.5);
+		while((sonars[0].getMM() + sonars[1].getMM())/2 > 1500) sleep(10);
+		while((sonars[0].getMM() + sonars[1].getMM())/2 > 200) correctTurnUsingSonars(50);
+		
+		// Deadreckon forward
+		leftDrive.moveEncoderTicks(50000, 0.5);
+		rightDrive.moveEncoderTicks(50000, 0.5);
+		
+		// Get into position using sonars
+
+		while((sonars[0].getMM() + sonars[1].getMM())/2 > 2000) {
+			correctTurnUsingSonars(50);
+		}
+		
+		// Dead reckon turn
+		turn(90);
+		
+		// Move up to castle. Stop at correct shooting distance
+		while((sonars[0].getMM() + sonars[1].getMM())/2 > 2000) {
+			correctTurnUsingSonars(50);
+		}
+		
+		// Position using vision processing
+		double acceptableDistance = 5;
+		double[] targetCenter = new double[]{500, 500};
+		double[] goalCenter;
+		do {
+			double[][] centers = finder.getGoalCenters();
+			
+			// goalCenter is the left most center
+			goalCenter = new double[]{Integer.MAX_VALUE, Integer.MAX_VALUE};
+			for(int a = 0; a < centers.length; a++) if(centers[a][0] < goalCenter[0]) goalCenter = centers[a];
+			
+			// Turn based on x position difference
+			
+			
+			
+			// Move back or forward based on y position difference
+			
+			
+			
+		} while(Math.sqrt(Math.pow(goalCenter[0] - targetCenter[0], 2) + Math.pow(goalCenter[1] - targetCenter[1], 2)) > acceptableDistance);
 		
 	}
 
@@ -97,18 +148,6 @@ public class Robot extends IterativeRobot {
 		//System.out.println("Speed: " + leftDrive.lastMotorSpeed);
 		leftDrive.setSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredL);
 		rightDrive.setSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredR);
-
-		// Update dashboard
-		for (int index = 0; index < 4; index++) {
-			if (camera.contoursExist(index)) {
-				SmartDashboard.putNumber("Contour " + index+1 +": X", camera.getContourX(index));
-				SmartDashboard.putNumber("Contour " + index+1 +": Y", camera.getContourY(index));
-				SmartDashboard.putNumber("Contour " + index+1 +": Height", camera.getContourHeight(index));
-				SmartDashboard.putNumber("Contour " + index+1 +": Width", camera.getContourWidth(index));
-			} else {
-				break;
-			}
-		}
 	}
 
 	public void disableInit() {

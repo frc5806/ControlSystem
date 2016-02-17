@@ -12,7 +12,6 @@ public class Roller extends PIDSubsystem {
 	MagnetSensor encoder;
 
 	boolean isForwards;
-	float lastMotorSpeed;
 	float targetRPM;
 	float currentTargetSpeed;
 	long startingMillis;
@@ -28,7 +27,6 @@ public class Roller extends PIDSubsystem {
 	
 	public void forward() {
 		setTargetSpeed(1000);
-		
 	}
 	
 	public void reverse() {
@@ -51,14 +49,16 @@ public class Roller extends PIDSubsystem {
 	
 	@Override
 	protected double returnPIDInput() {
-		long millisSince = System.currentTimeMillis() - startingMillis;
-		currentTargetSpeed = (millisSince / TIME_TO_FULL_SPEED_MILLIS) * targetRPM;
-		return (targetRPM - encoder.getRPM(SAMPLE_PERIOD_MILLIS)) / MAXIMUM_RPM;
+		return (currentTargetSpeed - encoder.getRPM(SAMPLE_PERIOD_MILLIS)) / MAXIMUM_RPM;
 	}
 
 	@Override
 	protected void usePIDOutput(double output) {
-		motorController.pidWrite(output*0.2);
+		motorController.pidWrite(output);
+		
+		// Update speed
+		long millisSince = System.currentTimeMillis() - startingMillis;
+		if(millisSince < TIME_TO_FULL_SPEED_MILLIS) currentTargetSpeed = (millisSince / TIME_TO_FULL_SPEED_MILLIS) * targetRPM;
 	}
 }
  
