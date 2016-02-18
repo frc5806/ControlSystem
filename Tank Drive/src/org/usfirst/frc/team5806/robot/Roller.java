@@ -2,27 +2,32 @@ package org.usfirst.frc.team5806.robot;
 
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Roller extends PIDSubsystem {
-	private static final int SAMPLE_PERIOD_MILLIS = 100;
+	private static final int SAMPLE_PERIOD_MILLIS = 1000;
 	public static final int MAXIMUM_RPM = 1000;
 	private static final int TIME_TO_FULL_SPEED_MILLIS = 10000;
 
 	Talon motorController;
-	MagnetSensor encoder;
+	public MagnetSensor encoder;
 
 	boolean isForwards;
 	float targetRPM;
 	float currentTargetSpeed;
 	long startingMillis;
 	
-	public Roller(int talonChannel, int magneticChannel) {
+	public Roller(Talon motorController, MagnetSensor encoder) {
 		super("Roller", 1, 0, 0);
 
-		motorController = new Talon(talonChannel);
-		encoder = new MagnetSensor(magneticChannel);
+		this.motorController = motorController;
+		this.encoder = encoder;
 
 		stop();
+	}
+	
+	public void debugSetSpeed(double speed) {
+		motorController.set(speed);
 	}
 	
 	public void forward() {
@@ -49,12 +54,15 @@ public class Roller extends PIDSubsystem {
 	
 	@Override
 	protected double returnPIDInput() {
-		return (currentTargetSpeed - encoder.getRPM(SAMPLE_PERIOD_MILLIS)) / MAXIMUM_RPM;
+		//return (currentTargetSpeed - encoder.getRPM(SAMPLE_PERIOD_MILLIS)) / MAXIMUM_RPM;
+		return 0;
 	}
 
 	@Override
 	protected void usePIDOutput(double output) {
-		motorController.pidWrite(output);
+		SmartDashboard.putNumber("Current target", currentTargetSpeed);
+		SmartDashboard.putNumber("Output", output);
+		//motorController.pidWrite(output);
 		
 		// Update speed
 		long millisSince = System.currentTimeMillis() - startingMillis;

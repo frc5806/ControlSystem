@@ -47,26 +47,5 @@ public class RobotDrive {
 		double factor = (degrees / 360.0);
 		move((int)(factor*ENCODER_TICKS_TO_ROBOT_ROTATION), (int)(-factor*ENCODER_TICKS_TO_ROBOT_ROTATION));
 	}
-	
-	public void correctTurnUsingSonars(Sonar leftSonar, Sonar rightSonar, int acceptableDistanceDifference) {
-		double initialLeftSpeed = leftDrive.getTargetSpeed();
-		double initialRightSpeed = rightDrive.getTargetSpeed();
-		
-		double sonarDistanceDiff = leftSonar.getMM() - rightSonar.getMM();
-		if(Math.abs(sonarDistanceDiff) > acceptableDistanceDifference) {
-			if(sonarDistanceDiff > 0) { // Left side is more forward than right
-				// Turn a little to the left based on distance difference
-				
-				
-			} else {
-				// Turn a little to the right based on distance difference
-				
-				
-			}
-		}
-		
-		leftDrive.setTargetSpeed(initialLeftSpeed);
-		rightDrive.setTargetSpeed(initialRightSpeed);
-	}
 
 }

@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import edu.wpi.first.wpilibj.CameraServer;
-
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Encoder;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -24,6 +24,7 @@ public class Robot extends IterativeRobot {
 	private static final double[] SHOOTING_RANGE_FEET = {3.75, 4.25};
 	private static final double[] GOAL_CENTERED_COORDS = {500, 500};
 	private static final double GOAL_CENTERED_ERROR = 10;
+	private static final int AUTONOMOUS_GOAL_NUMBER = 1;
 		
 	private static double limitedJoyL, limitedJoyR;
 
@@ -33,17 +34,17 @@ public class Robot extends IterativeRobot {
 	Joystick joystick;
 	RobotDrive drive;
 	
-	USBCamera camera;
+	/*USBCamera camera;
 	CameraServer cameraServer;
-	GoalFinder finder;
+	GoalFinder finder;*/
 	
-	// Compressor compressor;
+	Compressor compressor;
 	Roller roller;
 	Arm arm;
 	
 	ButtonHandler buttonHandler;
 
-	public boolean inShootingRange() {
+	/*public boolean inShootingRange() {
 		//assuming the robot is facing 90 deg toward wall
 		double feetFromWall = sonars[0].getFeet();
 		double[][] centerGuesses = finder.getGoalCenters();
@@ -60,7 +61,7 @@ public class Robot extends IterativeRobot {
 		return feetFromWall >= SHOOTING_RANGE_FEET[0]
 			&& feetFromWall <= SHOOTING_RANGE_FEET[1]
 			&& minDist <= GOAL_CENTERED_ERROR;
-	}
+	}*/
 	
 	public void robotInit() {
 		sonars = new Sonar[] { new Sonar(2), new Sonar(3) };
@@ -72,16 +73,17 @@ public class Robot extends IterativeRobot {
 					sonars[0],
 					sonars[1]);
 		
-		cameraServer = CameraServer.getInstance();
-		camera = new USBCamera(CAMERA_NAME);
-		finder = new GoalFinder(); 
+		//cameraServer = CameraServer.getInstance();
+		//camera = new USBCamera(CAMERA_NAME);
+		//finder = new GoalFinder(); 
 		
-		// compressor = new Compressor();
-		// compressor.start();
+		compressor = new Compressor();
+		compressor.start();
 
-		//roller = new Roller(2, 4);
 		arm = new Arm(1, 0);
-
+		roller = new Roller(new Talon(2), new MagnetSensor(4));
+		roller.enable();
+		
 		buttonHandler = new ButtonHandler(joystick);
 	}
 	
@@ -89,29 +91,30 @@ public class Robot extends IterativeRobot {
 		
 	}
 	
-	public void sleep(int millis) {
-		try {
-			Thread.sleep(millis);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
 	public void autonomousPeriodic() {
-		// Move to the low goal
 		drive.setSpeed(0.5);
 		
-		// Deadreckon forward
+		// Move to cast
+		if(AUTONOMOUS_GOAL_NUMBER == 1) {
+			drive.move(10000);
+			drive.pointTurn(90);
+		} else if(AUTONOMOUS_GOAL_NUMBER == 2) {
+			drive.move(10000);
+			drive.pointTurn(90);
+			drive.move(10000);
+			drive.pointTurn(-90);
+			drive.move(10000);
+		} else {
+			drive.move(10000);
+			drive.pointTurn(90);
+			drive.move(10000);
+			drive.pointTurn(-90);
+			drive.move(10000);
+			drive.pointTurn(-90);
+		}
 		
-		// Get into position using sonars
-		
-		// Dead reckon turn
-		
-		// Move up to castle. Stop at correct shooting distance
-		
-		// Position using vision processing
-		double acceptableDistance = 5;
+		// Vision processing angle calibration
+		/*double acceptableDistance = 5;
 		double[] targetCenter = new double[]{500, 500};
 		double[] goalCenter;
 		do {
@@ -126,26 +129,28 @@ public class Robot extends IterativeRobot {
 			// Move back or forward based on y position difference
 			
 		} while(Math.sqrt(Math.pow(goalCenter[0] - targetCenter[0], 2) + Math.pow(goalCenter[1] - targetCenter[1], 2)) > acceptableDistance);
+		*/
 		
+		// Shoot
 	}
 
 	public void teleopInit() {
 		limitedJoyL = 0.1;
 		limitedJoyR = 0.1;
-		cameraServer.startAutomaticCapture(camera);
+		//cameraServer.startAutomaticCapture(camera);
 	}
 
 	public void teleopPeriodic() {
 		if (buttonHandler.isDown('A')) {
-			//roller.forward();
+			roller.forward();
 		} else if (buttonHandler.isDown('B')) {
-			//roller.reverse();
+			roller.reverse();
 		} else {
-			//roller.stop();
+			roller.stop();
 		}
 
 		if (buttonHandler.readButton('X')) {
-			//arm.toggle();
+			arm.toggle();
 		}
 		
 		// using exponential moving averages for joystick limiting
@@ -155,11 +160,21 @@ public class Robot extends IterativeRobot {
 		double errorR = desiredR - limitedJoyR;
 		limitedJoyL += errorL * rampCoefficient;
 		limitedJoyR += errorR * rampCoefficient;
+		
+		//roller.debugSetSpeed(0.25);
+		
+		/*if(Math.abs(desiredL) > 0.15) roller.debugSetSpeed(Math.abs(desiredL) > .7 ? (desiredL > 0 ? 0.7 : -0.7) : desiredL);
+		else roller.debugSetSpeed(0);*/
+		
+		SmartDashboard.putNumber("Joystick", desiredL);
+		SmartDashboard.putNumber("Roller speed", roller.encoder.getRPM(1000));
+		SmartDashboard.putBoolean("Magnet", roller.encoder.getMagnet());
+		
 		//System.out.println("Speed: " + leftDrive.lastMotorSpeed);
-		drive.setSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredL, DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredR);
+		//drive.setSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredL, DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredR);
 	}
 
 	public void disableInit() {
-		//compressor.stop();
+		compressor.stop();
 	}
 }

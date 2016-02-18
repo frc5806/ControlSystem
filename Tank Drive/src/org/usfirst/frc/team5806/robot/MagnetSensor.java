@@ -14,7 +14,7 @@ public class MagnetSensor {
 		return !magnetSwitch.get();
 	}
 	
-	public float getRPM(int samplePeriodMillis) {
+	public double getRPM(int samplePeriodMillis) {
 		int magnetCounter = 0;
 		boolean detectedLastTime = false;
 		long startingTime = System.currentTimeMillis();
@@ -29,7 +29,6 @@ public class MagnetSensor {
 				detectedLastTime = false;
 			}
 		}
-		
-		return magnetCounter / (float)(samplePeriodMillis / (float)60000);
+		return (double)(magnetCounter / (double)(samplePeriodMillis / (double)60000));
 	}
 }
