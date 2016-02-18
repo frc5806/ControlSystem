@@ -9,10 +9,10 @@ public class DriveTrain extends PIDSubsystem {
 	private static final int SAMPLE_PERIOD_MILLIS = 100;
 	public static final int MAXIMUM_ENCODERS_PER_SECOND = 100000;
 	
-	public Talon motorController;
+	private Talon motorController;
 	public Encoder encoder;
 	
-	double targetEncoderSpeed;
+	private double targetEncoderSpeed;
 	
 	public DriveTrain(Talon motorController, Encoder encoder, int startingEncoderSpeed) {
 		super("DriveTrain", 1, 0, 0);
@@ -25,26 +25,12 @@ public class DriveTrain extends PIDSubsystem {
 		this.targetEncoderSpeed = startingEncoderSpeed;
 	}
 	
-	public void setSpeed(double targetEncoderSpeed) {
+	public double getTargetSpeed() { return targetEncoderSpeed; }
+	public void setTargetSpeed(double targetEncoderSpeed) {
 		if(targetEncoderSpeed > MAXIMUM_ENCODERS_PER_SECOND) targetEncoderSpeed = MAXIMUM_ENCODERS_PER_SECOND;
 		if(targetEncoderSpeed < -MAXIMUM_ENCODERS_PER_SECOND) targetEncoderSpeed = -MAXIMUM_ENCODERS_PER_SECOND;
 		
 		this.targetEncoderSpeed = targetEncoderSpeed;
-	}
-	
-	public void moveEncoderTicks(long encoderTicks, double speed) {
-		long startingTicks = encoder.get();
-		setSpeed(speed);
-		while(encoder.get() - startingTicks < encoderTicks) {
-			try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				System.out.println("Could not sleep while moving encoder ticks");
-				e.printStackTrace();
-			}
-		}
-		setSpeed(0.0f);
 	}
 	
 	@Override
@@ -58,14 +44,12 @@ public class DriveTrain extends PIDSubsystem {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		float encoderSpeed = (float)(encoder.get() - currentEncoderTicks) / (float)(SAMPLE_PERIOD_MILLIS / 1000.0f);
-		SmartDashboard.putNumber("Speed", encoderSpeed);
+		double encoderSpeed = (encoder.get() - currentEncoderTicks) / (double)(SAMPLE_PERIOD_MILLIS / 1000.0f);
 		return (targetEncoderSpeed - encoderSpeed) / MAXIMUM_ENCODERS_PER_SECOND;
 	}
 
 	@Override
 	protected void usePIDOutput(double output) {
-		SmartDashboard.putNumber("PID output", output);
 		motorController.pidWrite(output);
 	}
 

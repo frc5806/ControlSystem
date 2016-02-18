@@ -4,30 +4,53 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Talon;
 
 public class RobotDrive {
-	DriveTrain leftDrive, rightDrive;
+	public static final long ENCODER_TICKS_TO_ROBOT_ROTATION = 1000; 
+	
+	public DriveTrain leftDrive, rightDrive;
 	
 	public RobotDrive(DriveTrain leftDrive, DriveTrain rightDrive, Sonar leftSonar, Sonar rightSonar) {
-		leftDrive = new DriveTrain(new Talon(1), new Encoder(0, 1), 0);
-		rightDrive = new DriveTrain(new Talon(0), new Encoder(2, 3), 0);
-		leftDrive.enable();
-		rightDrive.enable();
+		this.leftDrive = leftDrive;
+		this.rightDrive = rightDrive;
+		this.leftDrive.enable();
+		this.rightDrive.enable();
 	}
 	
+	public void setSpeed(double speed) { setSpeed(speed, speed); }
 	public void setSpeed(double leftSpeed, double rightSpeed) {
-		leftDrive.setSpeed(leftSpeed);
-		rightDrive.setSpeed(rightSpeed);
+		leftDrive.setTargetSpeed(leftSpeed);
+		rightDrive.setTargetSpeed(rightSpeed);
 	}
 	
-	public void turn(int degrees) {
-		// FILL THIS IN
-		// USE THE TWO DRIVE TRAINS
-		// MEASURE THE ROBOT
+	public void move(int encoderTicks) { move(encoderTicks, encoderTicks); };
+	public void move(int leftEncoderTicks, int rightEncoderTicks) {
+		double leftOriginalSpeed = rightDrive.getTargetSpeed();
+		double rightOriginalSpeed = rightDrive.getTargetSpeed();
+		long leftStartingTicks = leftDrive.encoder.get();
+		long rightStartingTicks = rightDrive.encoder.get();
 		
+		boolean leftDone, rightDone;
+		do {
+			leftDone = leftDrive.encoder.get() - leftStartingTicks < leftEncoderTicks;
+			rightDone = rightDrive.encoder.get() - rightStartingTicks < rightEncoderTicks;
+			
+			// Turn off the motor if that side has moved its necessary encoder ticks
+			// THIS IS A PROBLEM. Will not acctually stay at 0 encoder ticks.
+			// Instead, will move in conjunction with the other side of the robot a little bit
+			if(leftDone) leftDrive.setTargetSpeed(0.0f);
+			if(rightDone) rightDrive.setTargetSpeed(0.0f);
+		} while(!leftDone && !rightDone);
+		
+		setSpeed(leftOriginalSpeed, rightOriginalSpeed);
+	}
+	
+	public void pointTurn(double degrees) {
+		double factor = (degrees / 360.0);
+		move((int)(factor*ENCODER_TICKS_TO_ROBOT_ROTATION), (int)(-factor*ENCODER_TICKS_TO_ROBOT_ROTATION));
 	}
 	
 	public void correctTurnUsingSonars(Sonar leftSonar, Sonar rightSonar, int acceptableDistanceDifference) {
-		float initialLeftSpeed = (float) leftDrive.targetEncoderSpeed;
-		float initialRightSpeed = (float) leftDrive.targetEncoderSpeed;
+		double initialLeftSpeed = leftDrive.getTargetSpeed();
+		double initialRightSpeed = rightDrive.getTargetSpeed();
 		
 		double sonarDistanceDiff = leftSonar.getMM() - rightSonar.getMM();
 		if(Math.abs(sonarDistanceDiff) > acceptableDistanceDifference) {
@@ -42,8 +65,8 @@ public class RobotDrive {
 			}
 		}
 		
-		leftDrive.setSpeed(initialLeftSpeed);
-		rightDrive.setSpeed(initialRightSpeed);
+		leftDrive.setTargetSpeed(initialLeftSpeed);
+		rightDrive.setTargetSpeed(initialRightSpeed);
 	}
 
 }

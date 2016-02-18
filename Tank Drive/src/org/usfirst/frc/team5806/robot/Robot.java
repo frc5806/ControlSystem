@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.Encoder;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,38 +21,32 @@ public class Robot extends IterativeRobot {
 	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
 	private static double rampCoefficient = 0.07;
 	private static final String CAMERA_NAME = "cam0";
-	
-	private static double limitedJoyL, limitedJoyR;
-
-	// Driving objects
-	Joystick joystick;
-
-	// Sensors
-	IMU imu;
-	Sonar[] sonars;
-
-	USBCamera camera;
-	CameraServer cameraServer;
-	GoalFinder finder;
-
-	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
-	//unused: private static final double DAMPENING_COEFFICIENT = -0.9;
-	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
-	private static double rampCoefficient = 0.07;
-	private static final String CAMERA_NAME = "cam0";
 	private static final double[] SHOOTING_RANGE_FEET = {3.75, 4.25};
 	private static final double[] GOAL_CENTERED_COORDS = {500, 500};
 	private static final double GOAL_CENTERED_ERROR = 10;
+		
+	private static double limitedJoyL, limitedJoyR;
 
-	ButtonHandler buttonHandler;
+	IMU imu;
+	Sonar[] sonars;
+	
+	Joystick joystick;
+	RobotDrive drive;
+	
+	USBCamera camera;
+	CameraServer cameraServer;
+	GoalFinder finder;
+	
+	// Compressor compressor;
 	Roller roller;
 	Arm arm;
-
+	
+	ButtonHandler buttonHandler;
 
 	public boolean inShootingRange() {
 		//assuming the robot is facing 90 deg toward wall
 		double feetFromWall = sonars[0].getFeet();
-		double[][] centerGuesses = goalFinder.getGoalCenters();
+		double[][] centerGuesses = finder.getGoalCenters();
 		double minDist = Double.MAX_VALUE;
 		for (int i = 0; i < centerGuesses.length; i++) {
 			double[] coords = centerGuesses[i];
@@ -70,21 +63,26 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void robotInit() {
-		joystick = new Joystick(1);
-
 		sonars = new Sonar[] { new Sonar(2), new Sonar(3) };
+		
+		joystick = new Joystick(1);
+		drive = new RobotDrive(
+					new DriveTrain(new Talon(1), new Encoder(0, 1), 0), 
+					new DriveTrain(new Talon(0), new Encoder(2, 3), 0), 
+					sonars[0],
+					sonars[1]);
 		
 		cameraServer = CameraServer.getInstance();
 		camera = new USBCamera(CAMERA_NAME);
 		finder = new GoalFinder(); 
-
-		buttonHandler = new ButtonHandler(joystick);
 		
 		// compressor = new Compressor();
 		// compressor.start();
 
 		//roller = new Roller(2, 4);
 		arm = new Arm(1, 0);
+
+		buttonHandler = new ButtonHandler(joystick);
 	}
 	
 	public void autonomousInit() {
@@ -102,28 +100,15 @@ public class Robot extends IterativeRobot {
 	
 	public void autonomousPeriodic() {
 		// Move to the low goal
-		leftDrive.setSpeed(0.5);
-		rightDrive.setSpeed(0.5);
-		while((sonars[0].getMM() + sonars[1].getMM())/2 > 1500) sleep(10);
-		while((sonars[0].getMM() + sonars[1].getMM())/2 > 200) correctTurnUsingSonars(50);
+		drive.setSpeed(0.5);
 		
 		// Deadreckon forward
-		leftDrive.moveEncoderTicks(50000, 0.5);
-		rightDrive.moveEncoderTicks(50000, 0.5);
 		
 		// Get into position using sonars
-
-		while((sonars[0].getMM() + sonars[1].getMM())/2 > 2000) {
-			correctTurnUsingSonars(50);
-		}
 		
 		// Dead reckon turn
-		turn(90);
 		
 		// Move up to castle. Stop at correct shooting distance
-		while((sonars[0].getMM() + sonars[1].getMM())/2 > 2000) {
-			correctTurnUsingSonars(50);
-		}
 		
 		// Position using vision processing
 		double acceptableDistance = 5;
@@ -138,11 +123,7 @@ public class Robot extends IterativeRobot {
 			
 			// Turn based on x position difference
 			
-			
-			
 			// Move back or forward based on y position difference
-			
-			
 			
 		} while(Math.sqrt(Math.pow(goalCenter[0] - targetCenter[0], 2) + Math.pow(goalCenter[1] - targetCenter[1], 2)) > acceptableDistance);
 		
@@ -175,8 +156,7 @@ public class Robot extends IterativeRobot {
 		limitedJoyL += errorL * rampCoefficient;
 		limitedJoyR += errorR * rampCoefficient;
 		//System.out.println("Speed: " + leftDrive.lastMotorSpeed);
-		leftDrive.setSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredL);
-		rightDrive.setSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredR);
+		drive.setSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredL, DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredR);
 	}
 
 	public void disableInit() {
