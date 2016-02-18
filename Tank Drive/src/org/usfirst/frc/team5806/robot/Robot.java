@@ -17,11 +17,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.vision.USBCamera;
 
 public class Robot extends IterativeRobot {
-	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
-	//unused: private static final double DAMPENING_COEFFICIENT = -0.9;
-	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
-	private static double rampCoefficient = 0.07;
-	private static final String CAMERA_NAME = "cam0";
 	
 	private static double limitedJoyL, limitedJoyR;
 
@@ -53,7 +48,7 @@ public class Robot extends IterativeRobot {
 	public boolean inShootingRange() {
 		//assuming the robot is facing 90 deg toward wall
 		double feetFromWall = sonars[0].getFeet();
-		double[][] centerGuesses = goalFinder.getGoalCenters();
+		double[][] centerGuesses = finder.getGoalCenters();
 		double minDist = Double.MAX_VALUE;
 		for (int i = 0; i < centerGuesses.length; i++) {
 			double[] coords = centerGuesses[i];
