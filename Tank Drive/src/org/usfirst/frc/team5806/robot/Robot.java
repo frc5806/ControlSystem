@@ -63,6 +63,13 @@ public class Robot extends IterativeRobot {
 			&& minDist <= GOAL_CENTERED_ERROR;
 	}*/
 	
+	public void correctTurnUsingSonars(int degrees) {
+		//do precise stuff
+	}
+	public void turn(int degrees) {
+		//do more dead-reckon-y stuff
+	}
+	
 	public void robotInit() {
 		sonars = new Sonar[] { new Sonar(2), new Sonar(3) };
 		
