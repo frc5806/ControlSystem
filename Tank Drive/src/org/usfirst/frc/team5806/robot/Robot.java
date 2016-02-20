@@ -30,6 +30,7 @@ public class Robot extends IterativeRobot {
 		
 	private static double limitedJoyL, limitedJoyR; 
 
+	IMU imu;
 	Sonar[] sonars;
 	
 	Joystick joystick;
