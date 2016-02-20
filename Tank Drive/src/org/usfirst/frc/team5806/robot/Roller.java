@@ -5,9 +5,9 @@ import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Roller extends PIDSubsystem {
-	private static final int SAMPLE_PERIOD_MILLIS = 1000;
-	public static final int MAXIMUM_RPM = 1000;
-	private static final int TIME_TO_FULL_SPEED_MILLIS = 10000;
+	private static final int SAMPLE_PERIOD_MILLIS = 50;
+	public static final int MAXIMUM_RPM = 9000;
+	private static final int TIME_TO_FULL_SPEED_MILLIS = 1000;
 
 	Talon motorController;
 	public MagnetSensor encoder;
@@ -15,6 +15,9 @@ public class Roller extends PIDSubsystem {
 	double targetRPM;
 	double currentTargetSpeed;
 	long startingMillis;
+	
+	boolean isReverse = false;
+	boolean isForward = false;
 	
 	public Roller(Talon motorController, MagnetSensor encoder) {
 		super("Roller", 1, 0, 0);
@@ -33,15 +36,32 @@ public class Roller extends PIDSubsystem {
 	}
 	
 	public void forward() {
-		setTargetSpeed(1000);
+		if(isForward == false) {
+			setTargetSpeed(7000);
+			isForward = true;
+			isReverse = false;
+		}
 	}
 	
 	public void reverse() {
-		setTargetSpeed(-500);
+		if(isReverse == false) {
+			setTargetSpeed(-3000);
+			isReverse = true;
+			isForward = false;
+		}
 	}
 	
 	public void stop() {
-		setTargetSpeed(0);
+		if(isForward || isReverse) {
+			setTargetSpeed(0);
+			isForward = false;
+			isReverse = false;
+		}
+	}
+	
+	public void toggleReverse() {
+		if(isReverse) stop();
+		else reverse();
 	}
 	
 	private void setTargetSpeed(double speed) {
@@ -56,16 +76,19 @@ public class Roller extends PIDSubsystem {
 	@Override
 	protected double returnPIDInput() {
 		double rpm = encoder.getRPM(SAMPLE_PERIOD_MILLIS);
-		if(targetRPM < 0) rpm += -1;
+		if(targetRPM < 0) rpm *= -1;
 		SmartDashboard.putNumber("Roller RPM", rpm);
-		return (currentTargetSpeed - rpm) / MAXIMUM_RPM;
+		return (currentTargetSpeed - rpm) / (double)MAXIMUM_RPM;
 	}
 
 	@Override
 	protected void usePIDOutput(double output) {
 		SmartDashboard.putNumber("Current target", currentTargetSpeed);
+		SmartDashboard.putNumber("Max target", targetRPM);
 		SmartDashboard.putNumber("Output", output);
-		//motorController.pidWrite(output);
+		if(!isReverse && !isForward) motorController.set(0);
+		if(isForward) motorController.set(0.75);
+		if(isReverse) motorController.set(-0.35);
 		
 		// Update speed
 		long millisSince = System.currentTimeMillis() - startingMillis;
