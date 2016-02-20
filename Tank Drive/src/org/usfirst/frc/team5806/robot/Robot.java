@@ -1,9 +1,5 @@
 package org.usfirst.frc.team5806.robot;
 
-
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
