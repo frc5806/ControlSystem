@@ -7,6 +7,14 @@ public class RobotDrive {
 	public static final long ENCODER_TICKS_TO_ROBOT_ROTATION = 1000; 
 	
 	public DriveTrain leftDrive, rightDrive;
+	public static final double WHEEL_DIAMETER = 7.65;
+	public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
+	public static final long TICKS_PER_MOTOR_REV = 1440;
+	public static final double MOTOR_REVS_PER_WHEEL_REV = 1 / 0.28;
+	public static final long TICKS_PER_WHEEL_REV = (long)(TICKS_PER_MOTOR_REV * MOTOR_REVS_PER_WHEEL_REV);
+	public static final long TICKS_PER_INCH = (long)((double)TICKS_PER_WHEEL_REV / WHEEL_CIRCUMFERENCE);
+	
+	DriveTrain leftDrive, rightDrive;
 	
 	public RobotDrive(DriveTrain leftDrive, DriveTrain rightDrive, Sonar leftSonar, Sonar rightSonar) {
 		this.leftDrive = leftDrive;

@@ -24,9 +24,12 @@ public class Robot extends IterativeRobot {
 	private static final double[] SHOOTING_RANGE_FEET = {3.75, 4.25};
 	private static final double[] GOAL_CENTERED_COORDS = {500, 500};
 	private static final double GOAL_CENTERED_ERROR = 10;
+
 	private static final int AUTONOMOUS_GOAL_NUMBER = 1;
 		
 	private static double limitedJoyL, limitedJoyR;
+
+	private static final double 
 
 	IMU imu;
 	Sonar[] sonars;
@@ -65,9 +68,6 @@ public class Robot extends IterativeRobot {
 	
 	public void correctTurnUsingSonars(int degrees) {
 		//do precise stuff
-	}
-	public void turn(int degrees) {
-		//do more dead-reckon-y stuff
 	}
 	
 	public void robotInit() {
