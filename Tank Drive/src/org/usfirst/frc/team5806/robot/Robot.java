@@ -4,6 +4,7 @@ package org.usfirst.frc.team5806.robot;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Encoder;
@@ -78,7 +79,8 @@ public class Robot extends IterativeRobot {
 					new DriveTrain(new Talon(1), new Encoder(0, 1), 0), 
 					new DriveTrain(new Talon(0), new Encoder(2, 3), 0), 
 					sonars[0],
-					sonars[1]);
+					sonars[1],
+					new ADXRS450_Gyro());
 		
 		//cameraServer = CameraServer.getInstance();
 		//camera = new USBCamera(CAMERA_NAME);
@@ -104,20 +106,20 @@ public class Robot extends IterativeRobot {
 		// Move to cast
 		if(AUTONOMOUS_GOAL_NUMBER == 1) {
 			drive.move(10000);
-			drive.pointTurn(90);
+			drive.pointTurn(90, 0.5);
 		} else if(AUTONOMOUS_GOAL_NUMBER == 2) {
 			drive.move(10000);
-			drive.pointTurn(90);
+			drive.pointTurn(90, 0.5);
 			drive.move(10000);
-			drive.pointTurn(-90);
+			drive.pointTurn(-90, 0.5);
 			drive.move(10000);
 		} else {
 			drive.move(10000);
-			drive.pointTurn(90);
+			drive.pointTurn(90, 0.5);
 			drive.move(10000);
-			drive.pointTurn(-90);
+			drive.pointTurn(-90, 0.5);
 			drive.move(10000);
-			drive.pointTurn(-90);
+			drive.pointTurn(-90, 0.5);
 		}
 		
 		// Vision processing angle calibration
@@ -148,14 +150,15 @@ public class Robot extends IterativeRobot {
 	}
 
 	public void teleopPeriodic() {
-		if (buttonHandler.isDown('A')) {
+		if (buttonHandler.readButton('A')) {
 			roller.forward();
-		} else if (buttonHandler.isDown('B')) {
+		}
+		if (buttonHandler.readButton('B')) {
 			roller.reverse();
-		} else {
+		}
+		if(buttonHandler.readButton('Y')){
 			roller.stop();
 		}
-
 		if (buttonHandler.readButton('X')) {
 			arm.toggle();
 		}
@@ -167,15 +170,6 @@ public class Robot extends IterativeRobot {
 		double errorR = desiredR - limitedJoyR;
 		limitedJoyL += errorL * rampCoefficient;
 		limitedJoyR += errorR * rampCoefficient;
-		
-		//roller.debugSetSpeed(0.25);
-		
-		/*if(Math.abs(desiredL) > 0.15) roller.debugSetSpeed(Math.abs(desiredL) > .7 ? (desiredL > 0 ? 0.7 : -0.7) : desiredL);
-		else roller.debugSetSpeed(0);*/
-		
-		SmartDashboard.putNumber("Joystick", desiredL);
-		SmartDashboard.putNumber("Roller speed", roller.encoder.getRPM(1000));
-		SmartDashboard.putBoolean("Magnet", roller.encoder.getMagnet());
 		
 		//System.out.println("Speed: " + leftDrive.lastMotorSpeed);
 		//drive.setSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredL, DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredR);
