@@ -11,14 +11,16 @@ public class Roller extends PIDSubsystem {
 
 	Talon motorController;
 	public MagnetSensor encoder;
-
-	boolean isForwards;
-	float targetRPM;
-	float currentTargetSpeed;
+	
+	double targetRPM;
+	double currentTargetSpeed;
 	long startingMillis;
 	
 	public Roller(Talon motorController, MagnetSensor encoder) {
 		super("Roller", 1, 0, 0);
+		
+		setAbsoluteTolerance(0.05);
+		getPIDController().setContinuous(false);
 
 		this.motorController = motorController;
 		this.encoder = encoder;
@@ -43,8 +45,7 @@ public class Roller extends PIDSubsystem {
 	}
 	
 	private void setTargetSpeed(double speed) {
-		targetRPM = (float) Math.abs(speed);
-		isForwards = speed > 0;
+		targetRPM = speed;
 		currentTargetSpeed = 0;
 		startingMillis = System.currentTimeMillis();
 	}
@@ -54,8 +55,10 @@ public class Roller extends PIDSubsystem {
 	
 	@Override
 	protected double returnPIDInput() {
-		//return (currentTargetSpeed - encoder.getRPM(SAMPLE_PERIOD_MILLIS)) / MAXIMUM_RPM;
-		return 0;
+		double rpm = encoder.getRPM(SAMPLE_PERIOD_MILLIS);
+		if(targetRPM < 0) rpm += -1;
+		SmartDashboard.putNumber("Roller RPM", rpm);
+		return (currentTargetSpeed - rpm) / MAXIMUM_RPM;
 	}
 
 	@Override
@@ -66,7 +69,9 @@ public class Roller extends PIDSubsystem {
 		
 		// Update speed
 		long millisSince = System.currentTimeMillis() - startingMillis;
-		if(millisSince < TIME_TO_FULL_SPEED_MILLIS) currentTargetSpeed = (millisSince / TIME_TO_FULL_SPEED_MILLIS) * targetRPM;
+		if(millisSince < TIME_TO_FULL_SPEED_MILLIS) currentTargetSpeed = (millisSince / (double)TIME_TO_FULL_SPEED_MILLIS) * targetRPM;
+		else currentTargetSpeed = targetRPM;
+		SmartDashboard.putNumber("Millis since", millisSince);
 	}
 }
  

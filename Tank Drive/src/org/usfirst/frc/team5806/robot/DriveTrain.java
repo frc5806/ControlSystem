@@ -2,6 +2,7 @@ package org.usfirst.frc.team5806.robot;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -39,11 +40,7 @@ public class DriveTrain extends PIDSubsystem {
 	@Override
 	protected double returnPIDInput() {
 		long currentEncoderTicks = encoder.get();
-		try {
-			Thread.sleep(SAMPLE_PERIOD_MILLIS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		Timer.delay(SAMPLE_PERIOD_MILLIS/1000.0);
 		double encoderSpeed = (encoder.get() - currentEncoderTicks) / (double)(SAMPLE_PERIOD_MILLIS / 1000.0f);
 		return (targetEncoderSpeed - encoderSpeed) / MAXIMUM_ENCODERS_PER_SECOND;
 	}
