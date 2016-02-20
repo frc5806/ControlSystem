@@ -25,11 +25,11 @@ public class Robot extends IterativeRobot {
 	private static final double[] SHOOTING_RANGE_FEET = {3.75, 4.25};
 	private static final double[] GOAL_CENTERED_COORDS = {500, 500};
 	private static final double GOAL_CENTERED_ERROR = 10;
+
 	private static final int AUTONOMOUS_GOAL_NUMBER = 1;
 		
-	private static double limitedJoyL, limitedJoyR;
+	private static double limitedJoyL, limitedJoyR; 
 
-	IMU imu;
 	Sonar[] sonars;
 	
 	Joystick joystick;
@@ -67,9 +67,6 @@ public class Robot extends IterativeRobot {
 	public void correctTurnUsingSonars(int degrees) {
 		//do precise stuff
 	}
-	public void turn(int degrees) {
-		//do more dead-reckon-y stuff
-	}
 	
 	public void robotInit() {
 		sonars = new Sonar[] { new Sonar(2), new Sonar(3) };
@@ -97,28 +94,24 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void autonomousInit() {
-		
-	}
-	
-	public void autonomousPeriodic() {
 		drive.setSpeed(0.5);
 		
 		// Move to cast
 		if(AUTONOMOUS_GOAL_NUMBER == 1) {
-			drive.move(10000);
+			drive.moveDistance(10000);
 			drive.pointTurn(90, 0.5);
 		} else if(AUTONOMOUS_GOAL_NUMBER == 2) {
-			drive.move(10000);
+			drive.moveDistance(10000);
 			drive.pointTurn(90, 0.5);
-			drive.move(10000);
+			drive.moveDistance(10000);
 			drive.pointTurn(-90, 0.5);
-			drive.move(10000);
+			drive.moveDistance(10000);
 		} else {
-			drive.move(10000);
+			drive.moveDistance(10000);
 			drive.pointTurn(90, 0.5);
-			drive.move(10000);
+			drive.moveDistance(10000);
 			drive.pointTurn(-90, 0.5);
-			drive.move(10000);
+			drive.moveDistance(10000);
 			drive.pointTurn(-90, 0.5);
 		}
 		
@@ -142,7 +135,7 @@ public class Robot extends IterativeRobot {
 		
 		// Shoot
 	}
-
+	
 	public void teleopInit() {
 		limitedJoyL = 0.1;
 		limitedJoyR = 0.1;

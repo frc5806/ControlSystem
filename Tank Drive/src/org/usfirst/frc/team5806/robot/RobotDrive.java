@@ -6,6 +6,13 @@ import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
 
 public class RobotDrive {
+	public static final double WHEEL_DIAMETER = 7.65;
+	public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
+	public static final long TICKS_PER_MOTOR_REV = 1440;
+	public static final double MOTOR_REVS_PER_WHEEL_REV = 1 / 0.28;
+	public static final long TICKS_PER_WHEEL_REV = (long)(TICKS_PER_MOTOR_REV * MOTOR_REVS_PER_WHEEL_REV);
+	public static final long TICKS_PER_INCH = (long)((double)TICKS_PER_WHEEL_REV / WHEEL_CIRCUMFERENCE);
+	
 	public DriveTrain leftDrive, rightDrive;
 	public Sonar leftSonar, rightSonar;
 	public ADXRS450_Gyro gyro;
@@ -56,6 +63,11 @@ public class RobotDrive {
 		} while (!leftDone && !rightDone);
 
 		setSpeed(leftOriginalSpeed, rightOriginalSpeed);
+	}
+	
+	public void moveDistance(double distance) {
+		double wheelRevs = distance / WHEEL_CIRCUMFERENCE;
+		move((int)(wheelRevs*TICKS_PER_WHEEL_REV));
 	}
 
 	public void pointTurn(double degrees, double speed) {
