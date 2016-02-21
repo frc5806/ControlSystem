@@ -59,7 +59,7 @@ public class Roller extends PIDSubsystem {
 	}
 	
 	private void setTargetSpeed(double speed) {
-		if(speed != setTargetSpeed) {
+		if(speed != targetRPM) {
 			targetRPM = speed;
 			currentTargetSpeed = 0;
 			startingMillis = System.currentTimeMillis();
@@ -81,8 +81,8 @@ public class Roller extends PIDSubsystem {
 
 	@Override
 	protected void usePIDOutput(double output) {
-		if(RollerState.STOPPED) motorController.set(0);
-		else if(RollerState.FORWARDS) motorController.set(0.75);
+		if(state == RollerState.STOPPED) motorController.set(0);
+		else if(state == RollerState.FORWARDS) motorController.set(0.75);
 		else motorController.set(-0.35);
 		
 		// Update speed

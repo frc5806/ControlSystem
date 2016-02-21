@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.vision.USBCamera;
@@ -120,9 +121,9 @@ public class Robot extends IterativeRobot {
 
 		// Shoot
 		roller.forward();
-		Timer.wait(Roller.TIME_TO_FULL_SPEED_MILLIS / 1000.0);
+		Timer.delay(Roller.TIME_TO_FULL_SPEED_MILLIS / 1000.0);
 		arm.push();
-		Timer.wait(2);
+		Timer.delay(2);
 	}
 	
 	public void teleopInit() {
@@ -165,10 +166,10 @@ public class Robot extends IterativeRobot {
 		// Update dashboard
 		SmartDashboard.putNumber("Left Sonar", sonars[0].getMM());
 		SmartDashboard.putNumber("Right Sonar", sonars[1].getMM());
-		SmartDashboard.putNumber("Left Encoder", robotDrive.leftDrive.encoder.get());
-		SmartDashboard.putNumber("Right Encoder", robotDrive.rightDrive.encoder.get());
-		SmartDashboard.putNumber("Gyro angle", gyro.getAngle());
-		SmartDashboard.putNumber("In shooting range", inShootingRange());
+		SmartDashboard.putNumber("Left Encoder", drive.leftDrive.encoder.get());
+		SmartDashboard.putNumber("Right Encoder", drive.rightDrive.encoder.get());
+		SmartDashboard.putNumber("Gyro angle", drive.gyro.getAngle());
+		SmartDashboard.putBoolean("In shooting range", inShootingRange());
 	}
 
 	public void disableInit() {

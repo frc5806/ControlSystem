@@ -54,9 +54,8 @@ public class RobotDrive {
 	};
 
 	public void moveDistance(double distance, double speed) {
-		setSpeed(speed);
 		double wheelRevs = distance / WHEEL_CIRCUMFERENCE;
-		move((int)(wheelRevs*TICKS_PER_WHEEL_REV));
+		move((int)(wheelRevs*TICKS_PER_WHEEL_REV), speed);
 		
 		setSpeed(0.0);
 	}
