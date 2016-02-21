@@ -14,9 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.vision.USBCamera;
 
 public class Robot extends IterativeRobot {
-	// HAS TO BE A NEGATIVE NUMBER SO IT GOES THE RIGHT WAY
-	//unused: private static final double DAMPENING_COEFFICIENT = -0.9;
-	// MINIMUM CHANGE IN JOYSTICK POSITION TO CAUSE CHANGE IN MOTORS
 	private static double rampCoefficient = 0.07;
 	private static final String CAMERA_NAME = "cam0";
 	private static final double[] SHOOTING_RANGE_FEET = {3.75, 4.25};
@@ -86,25 +83,26 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void autonomousInit() {
-		drive.setSpeed(0.5);
+		double driveSpeed = 0.5;
+		double turnSpeed = 0.5;
 		
-		// Move to cast
+		// Move to castle
 		if(AUTONOMOUS_GOAL_NUMBER == 1) {
-			drive.moveDistance(10000);
-			drive.pointTurn(90, 0.5);
+			drive.moveDistance(10000, driveSpeed);
+			drive.pointTurn(90, turnSpeed);
 		} else if(AUTONOMOUS_GOAL_NUMBER == 2) {
-			drive.moveDistance(10000);
-			drive.pointTurn(90, 0.5);
-			drive.moveDistance(10000);
-			drive.pointTurn(-90, 0.5);
-			drive.moveDistance(10000);
+			drive.moveDistance(10000, driveSpeed);
+			drive.pointTurn(90, turnSpeed);
+			drive.moveDistance(10000, driveSpeed);
+			drive.pointTurn(-90, turnSpeed);
+			drive.moveDistance(10000, driveSpeed);
 		} else {
-			drive.moveDistance(10000);
-			drive.pointTurn(90, 0.5);
-			drive.moveDistance(10000);
-			drive.pointTurn(-90, 0.5);
-			drive.moveDistance(10000);
-			drive.pointTurn(-90, 0.5);
+			drive.moveDistance(10000, driveSpeed);
+			drive.pointTurn(90, turnSpeed);
+			drive.moveDistance(10000, driveSpeed);
+			drive.pointTurn(-90, turnSpeed);
+			drive.moveDistance(10000, driveSpeed);
+			drive.pointTurn(-90, turnSpeed);
 		}
 		
 		// Vision processing angle calibration
@@ -119,6 +117,12 @@ public class Robot extends IterativeRobot {
 			else drive.pointTurn(-5, 0.3);
 			
 		} while(Math.sqrt(Math.pow(goalCenter[0] - targetCenter[0], 2) + Math.pow(goalCenter[1] - targetCenter[1], 2)) > GOAL_CENTERED_ERROR);
+
+		// Shoot
+		roller.forward();
+		Timer.wait(Roller.TIME_TO_FULL_SPEED_MILLIS / 1000.0);
+		arm.push();
+		Timer.wait(2);
 	}
 	
 	public void teleopInit() {
@@ -128,8 +132,7 @@ public class Robot extends IterativeRobot {
 	}
 
 	public void teleopPeriodic() {
-		SmartDashboard.putNumber("2nd axis", joystick.getRawAxis(2));
-		SmartDashboard.putNumber("3rd axis", joystick.getRawAxis(3));
+		// Listen to controls
 		if(joystick.getRawAxis(2) > 0.7) {
 			roller.forward();
 		} else {
@@ -145,23 +148,27 @@ public class Robot extends IterativeRobot {
 		if(buttonHandler.readButton('X')) {
 			roller.toggleReverse();
 		}
+
 		if(buttonHandler.readButton('A')){
 			arm.toggleElevation();
 		}
 		
-		// using exponential moving averages for joystick limiting
+		// Using exponential moving averages for joystick limiting
 		double desiredL = joystick.getRawAxis(1);
 		double desiredR = -joystick.getRawAxis(5);
 		double errorL = desiredL - limitedJoyL;
 		double errorR = desiredR - limitedJoyR;
 		limitedJoyL += errorL * rampCoefficient;
 		limitedJoyR += errorR * rampCoefficient;
-		
-		SmartDashboard.putNumber("Sonar 1", sonars[0].getMM());
-		SmartDashboard.putNumber("Sonar 2", sonars[1].getMM());
-		
-		//System.out.println("Speed: " + leftDrive.lastMotorSpeed);
 		drive.setSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredL, DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredR);
+
+		// Update dashboard
+		SmartDashboard.putNumber("Left Sonar", sonars[0].getMM());
+		SmartDashboard.putNumber("Right Sonar", sonars[1].getMM());
+		SmartDashboard.putNumber("Left Encoder", robotDrive.leftDrive.encoder.get());
+		SmartDashboard.putNumber("Right Encoder", robotDrive.rightDrive.encoder.get());
+		SmartDashboard.putNumber("Gyro angle", gyro.getAngle());
+		SmartDashboard.putNumber("In shooting range", inShootingRange());
 	}
 
 	public void disableInit() {

@@ -38,36 +38,27 @@ public class RobotDrive {
 		rightDrive.setTargetSpeed(rightSpeed);
 	}
 
-	public void move(int encoderTicks) {
-		move(encoderTicks, encoderTicks);
-	};
+	public void move(int encoderTicks, double speed) {
+		setSpeed(speed);
 
-	public void move(int leftEncoderTicks, int rightEncoderTicks) {
-		double leftOriginalSpeed = rightDrive.getTargetSpeed();
-		double rightOriginalSpeed = rightDrive.getTargetSpeed();
 		long leftStartingTicks = leftDrive.encoder.get();
 		long rightStartingTicks = rightDrive.encoder.get();
 
 		boolean leftDone, rightDone;
 		do {
-			leftDone = leftDrive.encoder.get() - leftStartingTicks < leftEncoderTicks;
-			rightDone = rightDrive.encoder.get() - rightStartingTicks < rightEncoderTicks;
-
-			// Turn off the motor if that side has moved its necessary encoder
-			// ticks
-			// THIS IS A PROBLEM. Will not acctually stay at 0 encoder ticks.
-			// Instead, will move in conjunction with the other side of the
-			// robot a little bit
-			if (leftDone) leftDrive.setTargetSpeed(0.0f);
-			if (rightDone) rightDrive.setTargetSpeed(0.0f);
+			leftDone = leftDrive.encoder.get() - leftStartingTicks < encoderTicks;
+			rightDone = rightDrive.encoder.get() - rightStartingTicks < encoderTicks;
 		} while (!leftDone && !rightDone);
 
-		setSpeed(leftOriginalSpeed, rightOriginalSpeed);
-	}
-	
-	public void moveDistance(double distance) {
+		setSpeed(0.0);
+	};
+
+	public void moveDistance(double distance, double speed) {
+		setSpeed(speed);
 		double wheelRevs = distance / WHEEL_CIRCUMFERENCE;
 		move((int)(wheelRevs*TICKS_PER_WHEEL_REV));
+		
+		setSpeed(0.0);
 	}
 
 	public void pointTurn(double degrees, double speed) {
