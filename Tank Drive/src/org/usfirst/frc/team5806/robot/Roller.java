@@ -34,12 +34,8 @@ public class Roller extends PIDSubsystem {
 		stop();
 	}
 	
-	public void debugSetSpeed(double speed) {
-		motorController.set(speed);
-	}
-	
 	public void forward() {
-		setTargetSpeed(7000);
+		setTargetSpeed(5000);
 		state = RollerState.FORWARDS;
 	}
 	
@@ -54,7 +50,7 @@ public class Roller extends PIDSubsystem {
 	}
 	
 	public void toggleReverse() {
-		if(state == RollerState.REVERSE) stop();
+		if(state != RollerState.STOPPED) stop();
 		else reverse();
 	}
 	
@@ -82,7 +78,7 @@ public class Roller extends PIDSubsystem {
 	@Override
 	protected void usePIDOutput(double output) {
 		if(state == RollerState.STOPPED) motorController.set(0);
-		else if(state == RollerState.FORWARDS) motorController.set(0.75);
+		else if(state == RollerState.FORWARDS) motorController.set(0.6);
 		else motorController.set(-0.35);
 		
 		// Update speed
@@ -94,6 +90,7 @@ public class Roller extends PIDSubsystem {
 		SmartDashboard.putNumber("Current target speed", currentTargetSpeed);
 		SmartDashboard.putNumber("Overall target speed", targetRPM);
 		SmartDashboard.putNumber("PID Output", output);
+		SmartDashboard.putNumber("Robot State", state.ordinal());
 	}
 }
  

@@ -59,7 +59,7 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void robotInit() {
-		sonars = new Sonar[] { new Sonar(2), new Sonar(3) };
+		sonars = new Sonar[] { new Sonar(3), new Sonar(0) };
 		
 		joystick = new Joystick(1);
 		drive = new RobotDrive(
@@ -136,7 +136,11 @@ public class Robot extends IterativeRobot {
 		// Listen to controls
 		if(joystick.getRawAxis(2) > 0.7) {
 			roller.forward();
-		} else {
+		}
+		if(buttonHandler.readButton('X')) {
+			roller.reverse();
+		}
+		if(buttonHandler.readButton('Y')) {
 			roller.stop();
 		}
 		
@@ -145,13 +149,12 @@ public class Robot extends IterativeRobot {
 		} else {
 			arm.retract();
 		}
-		
-		if(buttonHandler.readButton('X')) {
-			roller.toggleReverse();
-		}
 
 		if(buttonHandler.readButton('A')){
-			arm.toggleElevation();
+			arm.raise();
+		}
+		if(buttonHandler.readButton('B')) {
+			arm.lower();
 		}
 		
 		// Using exponential moving averages for joystick limiting
@@ -169,7 +172,7 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("Left Encoder", drive.leftDrive.encoder.get());
 		SmartDashboard.putNumber("Right Encoder", drive.rightDrive.encoder.get());
 		SmartDashboard.putNumber("Gyro angle", drive.gyro.getAngle());
-		SmartDashboard.putBoolean("In shooting range", inShootingRange());
+		//SmartDashboard.putBoolean("In shooting range", inShootingRange());
 	}
 
 	public void disableInit() {
