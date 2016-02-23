@@ -1,6 +1,8 @@
 package org.usfirst.frc.team5806.robot;
 
 import java.awt.image.BufferedImage;
+import java.awt.Image;
+import java.awt.image.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,6 +33,24 @@ public class GoalFinder {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	private BufferedImage byteBufferToBufferedImage(ByteBuffer buff) {
+		byte[] data = buff.array();
+		ByteArrayInputStream in = new ByteArrayInputStream(data);
+		BufferedImage image = null;
+		try {
+			ImageIO.read(in);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		return image;
+	}
+	
+	private BufferedImage resizeImage(BufferedImage image, double xMult, double yMult) {
+		int newWidth = (int)(xMult * image.getWidth());
+		int newHeight = (int)(yMult * image.getHeight());
+		return (BufferedImage) image.getScaledInstance(newWidth,  newHeight, Image.SCALE_DEFAULT);
 	}
 	
 	public double[][] getGoalCenters() {
