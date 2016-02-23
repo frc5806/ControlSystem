@@ -9,23 +9,18 @@ import javax.imageio.ImageIO;
 
 import edu.wpi.first.wpilibj.vision.USBCamera;
 
+//get image data from camera via getImage(ByteBuffer buff)
+
 public class GoalFinder {
 	USBCamera camera;
 	public GoalFinder(USBCamera camera) {
 		this.camera = camera;
 	}
-	
-	private BufferedImage getImage() {
-		ByteBuffer byteBuffer = null;
-		camera.getImageData(byteBuffer);
-		try {
-			return ImageIO.read(new ByteArrayInputStream(byteBuffer.array()));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+	private BufferedImage byteBufferToBufferedImage(ByteBuffer buff) {
+		
 	}
+	
+	private void resizeImage()
 	
 	public double[][] getGoalCenters() {
 		System.out.println(getImage().getHeight());
