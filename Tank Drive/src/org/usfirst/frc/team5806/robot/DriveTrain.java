@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveTrain extends PIDSubsystem {
-	private static final int SAMPLE_PERIOD_MILLIS = 100;
+	private static final int SAMPLE_PERIOD_MILLIS = 50;
 	public static final int MAXIMUM_ENCODERS_PER_SECOND = 100000;
 	
 	private Talon motorController;
@@ -47,7 +47,8 @@ public class DriveTrain extends PIDSubsystem {
 
 	@Override
 	protected void usePIDOutput(double output) {
-		motorController.pidWrite(output);
+		if(Math.abs(targetEncoderSpeed) > MAXIMUM_ENCODERS_PER_SECOND/15.0) motorController.pidWrite(output);
+		else motorController.set(0);
 	}
 
 }

@@ -1,6 +1,7 @@
 package org.usfirst.frc.team5806.robot;
 
 import edu.wpi.first.wpilibj.Talon;
+
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -78,8 +79,8 @@ public class Roller extends PIDSubsystem {
 	@Override
 	protected void usePIDOutput(double output) {
 		if(state == RollerState.STOPPED) motorController.set(0);
-		else if(state == RollerState.FORWARDS) motorController.set(0.6);
-		else motorController.set(-0.35);
+		else if(state == RollerState.FORWARDS) motorController.set(-0.8);
+		else motorController.set(0.2);
 		
 		// Update speed
 		long millisSince = System.currentTimeMillis() - startingMillis;

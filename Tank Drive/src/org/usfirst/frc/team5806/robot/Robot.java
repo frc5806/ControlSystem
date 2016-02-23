@@ -8,8 +8,10 @@ import edu.wpi.first.wpilibj.Encoder;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.vision.USBCamera;
@@ -31,7 +33,7 @@ public class Robot extends IterativeRobot {
 	RobotDrive drive;
 	
 	//USBCamera camera;
-	//CameraServer cameraServer;
+	CameraServer cameraServer;
 	GoalFinder finder;
 	
 	Compressor compressor;
@@ -62,25 +64,26 @@ public class Robot extends IterativeRobot {
 		sonars = new Sonar[] { new Sonar(3), new Sonar(0) };
 		
 		joystick = new Joystick(1);
-		drive = new RobotDrive(
-					new DriveTrain(new Talon(1), new Encoder(0, 1), 0), 
-					new DriveTrain(new Talon(0), new Encoder(2, 3), 0), 
-					sonars[0],
-					sonars[1],
-					new ADXRS450_Gyro());
 		
-		//cameraServer = CameraServer.getInstance();
+		cameraServer = CameraServer.getInstance();
 		//camera = new USBCamera(CAMERA_NAME);
 		finder = new GoalFinder(); 
 		
 		compressor = new Compressor();
 		compressor.start();
 
-		arm = new Arm(new DoubleSolenoid(1, 0), new DoubleSolenoid(2, 3));
+		arm = new Arm(new DoubleSolenoid(7, 5), new DoubleSolenoid(4, 1));
 		roller = new Roller(new Talon(2), new MagnetSensor(4));
 		roller.enable();
 		
 		buttonHandler = new ButtonHandler(joystick);
+		
+		drive = new RobotDrive(
+				new DriveTrain(new Talon(1), new Encoder(0, 1), 0), 
+				new DriveTrain(new Talon(0), new Encoder(2, 3), 0), 
+				sonars[0],
+				sonars[1],
+				new ADXRS450_Gyro());
 	}
 	
 	public void autonomousInit() {
@@ -129,7 +132,7 @@ public class Robot extends IterativeRobot {
 	public void teleopInit() {
 		limitedJoyL = 0.1;
 		limitedJoyR = 0.1;
-		//cameraServer.startAutomaticCapture(camera);
+		cameraServer.startAutomaticCapture(CAMERA_NAME);
 	}
 
 	public void teleopPeriodic() {
@@ -153,6 +156,7 @@ public class Robot extends IterativeRobot {
 		if(buttonHandler.readButton('A')){
 			arm.raise();
 		}
+		
 		if(buttonHandler.readButton('B')) {
 			arm.lower();
 		}
@@ -171,7 +175,7 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("Right Sonar", sonars[1].getMM());
 		SmartDashboard.putNumber("Left Encoder", drive.leftDrive.encoder.get());
 		SmartDashboard.putNumber("Right Encoder", drive.rightDrive.encoder.get());
-		SmartDashboard.putNumber("Gyro angle", drive.gyro.getAngle());
+		//SmartDashboard.putNumber("Gyro angle", drive.gyro.getAngle());
 		//SmartDashboard.putBoolean("In shooting range", inShootingRange());
 	}
 

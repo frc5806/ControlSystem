@@ -27,6 +27,7 @@ public class RobotDrive {
 		this.rightSonar = rightSonar;
 
 		this.gyro = gyro;
+		this.gyro.calibrate();
 	}
 
 	public void setSpeed(double speed) {

@@ -1,8 +1,8 @@
 <grip:Pipeline>
   <sources>
-    <grip:ImageFile>
-      <property name="path" value="C:\Users\basementlions\Downloads\FieldImages\RealFullField\3.jpg"/>
-    </grip:ImageFile>
+    <grip:Camera>
+      <property name="deviceNumber" value="1"/>
+    </grip:Camera>
   </sources>
   <steps>
     <grip:Step name="CV resize">
@@ -103,6 +103,10 @@
   </steps>
   <connections>
     <grip:Connection>
+      <grip:Output step="0" socket="0" previewed="false"/>
+      <grip:Input step="1" socket="0"/>
+    </grip:Connection>
+    <grip:Connection>
       <grip:Output step="2" socket="0" previewed="true"/>
       <grip:Input step="3" socket="0"/>
     </grip:Connection>
@@ -115,10 +119,6 @@
       <grip:Input step="0" socket="0"/>
     </grip:Connection>
     <grip:Connection>
-      <grip:Output step="0" socket="0" previewed="false"/>
-      <grip:Input step="1" socket="0"/>
-    </grip:Connection>
-    <grip:Connection>
       <grip:Output step="3" socket="0" previewed="true"/>
       <grip:Input step="4" socket="0"/>
     </grip:Connection>
@@ -126,7 +126,7 @@
   <settings>
     <teamNumber>0</teamNumber>
     <publishAddress>roborio-0-frc.local</publishAddress>
-    <deployAddress>roborio-0-frc.local</deployAddress>
+    <deployAddress>roborio-5806-frc.local</deployAddress>
     <deployDir>/home/lvuser</deployDir>
     <deployUser>lvuser</deployUser>
     <deployJavaHome>/usr/local/frc/JRE/</deployJavaHome>
