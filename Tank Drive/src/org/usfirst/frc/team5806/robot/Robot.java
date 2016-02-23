@@ -32,7 +32,6 @@ public class Robot extends IterativeRobot {
 	Joystick joystick;
 	RobotDrive drive;
 	
-	//USBCamera camera;
 	CameraServer cameraServer;
 	GoalFinder finder;
 	
@@ -66,13 +65,12 @@ public class Robot extends IterativeRobot {
 		joystick = new Joystick(1);
 		
 		cameraServer = CameraServer.getInstance();
-		//camera = new USBCamera(CAMERA_NAME);
-		finder = new GoalFinder(); 
+		finder = new GoalFinder(new USBCamera(CAMERA_NAME)); 
 		
 		compressor = new Compressor();
 		compressor.start();
 
-		arm = new Arm(new DoubleSolenoid(7, 5), new DoubleSolenoid(4, 1));
+		arm = new Arm(new DoubleSolenoid(6, 7), new DoubleSolenoid(0, 1));
 		roller = new Roller(new Talon(2), new MagnetSensor(4));
 		roller.enable();
 		
@@ -175,6 +173,7 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("Right Sonar", sonars[1].getMM());
 		SmartDashboard.putNumber("Left Encoder", drive.leftDrive.encoder.get());
 		SmartDashboard.putNumber("Right Encoder", drive.rightDrive.encoder.get());
+		//finder.getGoalCenters();
 		//SmartDashboard.putNumber("Gyro angle", drive.gyro.getAngle());
 		//SmartDashboard.putBoolean("In shooting range", inShootingRange());
 	}

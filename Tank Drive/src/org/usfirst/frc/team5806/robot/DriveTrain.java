@@ -47,7 +47,7 @@ public class DriveTrain extends PIDSubsystem {
 
 	@Override
 	protected void usePIDOutput(double output) {
-		if(Math.abs(targetEncoderSpeed) > MAXIMUM_ENCODERS_PER_SECOND/15.0) motorController.pidWrite(output);
+		if(Math.abs(targetEncoderSpeed) > MAXIMUM_ENCODERS_PER_SECOND * 0.15) motorController.pidWrite(output);
 		else motorController.set(0);
 	}
 
