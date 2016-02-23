@@ -2,6 +2,7 @@ package org.usfirst.frc.team5806.robot;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -16,11 +17,21 @@ public class GoalFinder {
 	public GoalFinder(USBCamera camera) {
 		this.camera = camera;
 	}
-	private BufferedImage byteBufferToBufferedImage(ByteBuffer buff) {
-		
-	}
 	
-	private void resizeImage()
+	private ByteBuffer bufferedImageToByteBuffer(BufferedImage buff) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try {
+			ImageIO.write(buff, "png", baos);
+			baos.flush();
+			byte[] imageInByte = baos.toByteArray();
+			baos.close();
+			return ByteBuffer.wrap(imageInByte);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
 	
 	public double[][] getGoalCenters() {
 		System.out.println(getImage().getHeight());
