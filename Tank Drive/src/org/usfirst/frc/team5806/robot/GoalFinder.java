@@ -20,6 +20,12 @@ public class GoalFinder {
 		this.camera = camera;
 	}
 	
+	private ByteBuffer getImage() {
+		ByteBuffer buff = null;
+		camera.getImageData(buff);
+		return buff;
+	}
+	
 	private ByteBuffer bufferedImageToByteBuffer(BufferedImage buff) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try {
