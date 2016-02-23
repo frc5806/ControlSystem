@@ -33,7 +33,7 @@ public class Robot extends IterativeRobot {
 	RobotDrive drive;
 	
 	CameraServer cameraServer;
-	GoalFinder finder;
+	//GoalFinder finder;
 	
 	Compressor compressor;
 	Roller roller;
@@ -41,7 +41,7 @@ public class Robot extends IterativeRobot {
 	
 	ButtonHandler buttonHandler;
 
-	public boolean inShootingRange() {
+	/*public boolean inShootingRange() {
 		//assuming the robot is facing 90 deg toward wall
 		double feetFromWall = sonars[0].getFeet();
 		double[][] centerGuesses = finder.getGoalCenters();
@@ -57,15 +57,14 @@ public class Robot extends IterativeRobot {
 		return feetFromWall >= SHOOTING_RANGE_FEET[0]
 			&& feetFromWall <= SHOOTING_RANGE_FEET[1]
 			&& minDist <= GOAL_CENTERED_ERROR;
-	}
+	}*/
 	
 	public void robotInit() {
 		sonars = new Sonar[] { new Sonar(3), new Sonar(0) };
 		
 		joystick = new Joystick(1);
 		
-		cameraServer = CameraServer.getInstance();
-		finder = new GoalFinder(new USBCamera(CAMERA_NAME)); 
+		//finder = new GoalFinder(new USBCamera(CAMERA_NAME)); 
 		
 		compressor = new Compressor();
 		compressor.start();
@@ -108,7 +107,7 @@ public class Robot extends IterativeRobot {
 		}
 		
 		// Vision processing angle calibration
-		double[] targetCenter = new double[]{500, 500};
+		/*double[] targetCenter = new double[]{500, 500};
 		double[] goalCenter;
 		do {
 			double[][] centers = finder.getGoalCenters();
@@ -119,7 +118,7 @@ public class Robot extends IterativeRobot {
 			else drive.pointTurn(-5, 0.3);
 			
 		} while(Math.sqrt(Math.pow(goalCenter[0] - targetCenter[0], 2) + Math.pow(goalCenter[1] - targetCenter[1], 2)) > GOAL_CENTERED_ERROR);
-
+		 */
 		// Shoot
 		roller.forward();
 		Timer.delay(Roller.TIME_TO_FULL_SPEED_MILLIS / 1000.0);
@@ -130,7 +129,12 @@ public class Robot extends IterativeRobot {
 	public void teleopInit() {
 		limitedJoyL = 0.1;
 		limitedJoyR = 0.1;
-		cameraServer.startAutomaticCapture(CAMERA_NAME);
+		
+		if(cameraServer == null) {
+			cameraServer = CameraServer.getInstance();
+			cameraServer.startAutomaticCapture(CAMERA_NAME);
+		}
+		
 	}
 
 	public void teleopPeriodic() {

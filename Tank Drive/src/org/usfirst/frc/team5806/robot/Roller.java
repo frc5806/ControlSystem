@@ -80,7 +80,7 @@ public class Roller extends PIDSubsystem {
 	protected void usePIDOutput(double output) {
 		if(state == RollerState.STOPPED) motorController.set(0);
 		else if(state == RollerState.FORWARDS) motorController.set(-0.8);
-		else motorController.set(0.2);
+		else motorController.set(0.23);
 		
 		// Update speed
 		long millisSince = System.currentTimeMillis() - startingMillis;
