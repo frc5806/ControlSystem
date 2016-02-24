@@ -10,7 +10,7 @@ public class DriveTrain extends PIDSubsystem {
 	private static final int SAMPLE_PERIOD_MILLIS = 50;
 	public static final int MAXIMUM_ENCODERS_PER_SECOND = 100000;
 	
-	private Talon motorController;
+	public Talon motorController;
 	public Encoder encoder;
 	
 	private double targetEncoderSpeed;

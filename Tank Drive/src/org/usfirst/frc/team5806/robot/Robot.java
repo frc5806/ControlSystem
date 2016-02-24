@@ -32,8 +32,7 @@ public class Robot extends IterativeRobot {
 	Joystick joystick;
 	RobotDrive drive;
 	
-	CameraServer cameraServer;
-	//GoalFinder finder;
+	TargetTracker tracker;
 	
 	Compressor compressor;
 	Roller roller;
@@ -81,13 +80,17 @@ public class Robot extends IterativeRobot {
 				sonars[0],
 				sonars[1],
 				new ADXRS450_Gyro());
+		
+		tracker = new TargetTracker();
 	}
 	
 	public void autonomousInit() {
 		double driveSpeed = 0.5;
 		double turnSpeed = 0.5;
 		
-		// Move to castle
+		drive.moveDistance(100, driveSpeed);
+		
+		/*// Move to castle
 		if(AUTONOMOUS_GOAL_NUMBER == 1) {
 			drive.moveDistance(10000, driveSpeed);
 			drive.pointTurn(90, turnSpeed);
@@ -104,7 +107,7 @@ public class Robot extends IterativeRobot {
 			drive.pointTurn(-90, turnSpeed);
 			drive.moveDistance(10000, driveSpeed);
 			drive.pointTurn(-90, turnSpeed);
-		}
+		}*/
 		
 		// Vision processing angle calibration
 		/*double[] targetCenter = new double[]{500, 500};
@@ -120,21 +123,15 @@ public class Robot extends IterativeRobot {
 		} while(Math.sqrt(Math.pow(goalCenter[0] - targetCenter[0], 2) + Math.pow(goalCenter[1] - targetCenter[1], 2)) > GOAL_CENTERED_ERROR);
 		 */
 		// Shoot
-		roller.forward();
+		/*roller.forward();
 		Timer.delay(Roller.TIME_TO_FULL_SPEED_MILLIS / 1000.0);
 		arm.push();
-		Timer.delay(2);
+		Timer.delay(2);*/
 	}
 	
 	public void teleopInit() {
 		limitedJoyL = 0.1;
 		limitedJoyR = 0.1;
-		
-		if(cameraServer == null) {
-			cameraServer = CameraServer.getInstance();
-			cameraServer.startAutomaticCapture(CAMERA_NAME);
-		}
-		
 	}
 
 	public void teleopPeriodic() {
@@ -165,18 +162,21 @@ public class Robot extends IterativeRobot {
 		
 		// Using exponential moving averages for joystick limiting
 		double desiredL = joystick.getRawAxis(1);
-		double desiredR = -joystick.getRawAxis(5);
+		double desiredR = joystick.getRawAxis(5);
 		double errorL = desiredL - limitedJoyL;
 		double errorR = desiredR - limitedJoyR;
 		limitedJoyL += errorL * rampCoefficient;
 		limitedJoyR += errorR * rampCoefficient;
-		drive.setSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredL, DriveTrain.MAXIMUM_ENCODERS_PER_SECOND * desiredR);
+		drive.setSpeed(desiredL, desiredR);
 
 		// Update dashboard
 		SmartDashboard.putNumber("Left Sonar", sonars[0].getMM());
 		SmartDashboard.putNumber("Right Sonar", sonars[1].getMM());
 		SmartDashboard.putNumber("Left Encoder", drive.leftDrive.encoder.get());
 		SmartDashboard.putNumber("Right Encoder", drive.rightDrive.encoder.get());
+		SmartDashboard.putNumber("Left target", drive.leftDrive.getTargetSpeed());
+		SmartDashboard.putNumber("Right target", drive.rightDrive.getTargetSpeed());
+		tracker.retrieveBestTarget();
 		//finder.getGoalCenters();
 		//SmartDashboard.putNumber("Gyro angle", drive.gyro.getAngle());
 		//SmartDashboard.putBoolean("In shooting range", inShootingRange());
