@@ -88,9 +88,13 @@ public class TargetTracker {
 	Image binaryFrame;
 	
 	
-	public void TargetReport()
+	public TargetTracker()
 	{
-		this.camera = new USBCamera("cam0");
+		camera = new USBCamera("cam0");
+		camera.openCamera();
+		camera.startCapture();
+		
+		System.out.println("Bool first: " + (camera == null));
 		frame = NIVision.imaqCreateImage(ImageType.IMAGE_RGB, 0);
 		binaryFrame = NIVision.imaqCreateImage(ImageType.IMAGE_U8, 0);
 		areaFilterCritera[0] = new NIVision.ParticleFilterCriteria2(
@@ -106,7 +110,7 @@ public class TargetTracker {
 	public ParticleReport retrieveBestTarget()
 	{
 //		// make sure we have an image
-		/*if (frame != null && binaryFrame != null)
+		if (frame != null && binaryFrame != null)
 		{			
 			// get images (DO NOT GET binaryFrame, its created by the threshold operation below)
 			camera.getImage(frame);
@@ -172,9 +176,9 @@ public class TargetTracker {
 				currentBestTarget = bestTarget;
 				return bestTarget;
 			}
-		}*/
-		
+		}
 		camera.getImage(frame);
+		System.out.println("Bool second: " + (frame == null));
 		CameraServer.getInstance().setImage(frame);
 		
 		return null;

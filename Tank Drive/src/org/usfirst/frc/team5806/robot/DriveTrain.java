@@ -28,8 +28,8 @@ public class DriveTrain extends PIDSubsystem {
 	
 	public double getTargetSpeed() { return targetEncoderSpeed; }
 	public void setTargetSpeed(double targetEncoderSpeed) {
-		if(targetEncoderSpeed > MAXIMUM_ENCODERS_PER_SECOND) targetEncoderSpeed = MAXIMUM_ENCODERS_PER_SECOND;
-		if(targetEncoderSpeed < -MAXIMUM_ENCODERS_PER_SECOND) targetEncoderSpeed = -MAXIMUM_ENCODERS_PER_SECOND;
+		if(targetEncoderSpeed > MAXIMUM_ENCODERS_PER_SECOND*0.4) targetEncoderSpeed = 0.4*MAXIMUM_ENCODERS_PER_SECOND;
+		if(targetEncoderSpeed < -MAXIMUM_ENCODERS_PER_SECOND*0.4) targetEncoderSpeed = -0.4*MAXIMUM_ENCODERS_PER_SECOND;
 		
 		this.targetEncoderSpeed = targetEncoderSpeed;
 	}

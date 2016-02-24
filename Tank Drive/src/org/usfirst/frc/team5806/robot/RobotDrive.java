@@ -9,16 +9,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class RobotDrive {
 	public static final double WHEEL_DIAMETER = 7.65;
 	public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
-	public static final long TICKS_PER_MOTOR_REV = 90;
+	public static final long TICKS_PER_MOTOR_REV = 64;
 	public static final double MOTOR_REVS_PER_WHEEL_REV = 1 / 0.28;
 	public static final long TICKS_PER_WHEEL_REV = (long)(TICKS_PER_MOTOR_REV * MOTOR_REVS_PER_WHEEL_REV);
 	public static final long TICKS_PER_INCH = (long)((double)TICKS_PER_WHEEL_REV / WHEEL_CIRCUMFERENCE);
+	public static final int NINETY_DEGREE_TURN = 190;
+	public static final int MAX_DIPLACEMENT_DIFFERENCE = 200;
 	
 	public DriveTrain leftDrive, rightDrive;
 	public Sonar leftSonar, rightSonar;
-	public ADXRS450_Gyro gyro;
 
-	public RobotDrive(DriveTrain leftDrive, DriveTrain rightDrive, Sonar leftSonar, Sonar rightSonar, ADXRS450_Gyro gyro) {
+	public RobotDrive(DriveTrain leftDrive, DriveTrain rightDrive, Sonar leftSonar, Sonar rightSonar) {
 		this.leftDrive = leftDrive;
 		this.rightDrive = rightDrive;
 		this.leftDrive.enable();
@@ -26,9 +27,6 @@ public class RobotDrive {
 
 		this.leftSonar = leftSonar;
 		this.rightSonar = rightSonar;
-
-		this.gyro = gyro;
-		this.gyro.calibrate();
 	}
 
 	public void setSpeed(double speed) {
@@ -41,6 +39,11 @@ public class RobotDrive {
 		//leftDrive.motorController.set(-leftSpeed);
 		//rightDrive.motorController.set(rightSpeed);
 	}
+	
+	public void addToSpeed(double leftAdd, double rightAdd) {
+		leftDrive.setTargetSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND*leftAdd + leftDrive.getTargetSpeed());
+		rightDrive.setTargetSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND*rightAdd + rightDrive.getTargetSpeed());
+	}
 
 	public void move(int encoderTicks, double speed) {
 		setSpeed(speed);
@@ -49,11 +52,35 @@ public class RobotDrive {
 		long rightStartingTicks = rightDrive.encoder.get();
 
 		boolean leftDone, rightDone;
+		int leftDisplacement, rightDisplacement;
+		int displacementDifference;
 		do {
 			SmartDashboard.putNumber("Left progress", leftDrive.encoder.get() - leftStartingTicks);
 			SmartDashboard.putNumber("Right progress", rightDrive.encoder.get() - rightStartingTicks);
-			leftDone = leftDrive.encoder.get() - leftStartingTicks > encoderTicks;
-			rightDone = rightDrive.encoder.get() - rightStartingTicks > encoderTicks;
+			leftDisplacement = (int) (leftDrive.encoder.get() - leftStartingTicks);
+			rightDisplacement = (int) (rightDrive.encoder.get() - rightStartingTicks);
+			
+			displacementDifference = leftDisplacement - rightDisplacement;
+			SmartDashboard.putNumber("difference displacement", displacementDifference);
+			SmartDashboard.putNumber("Right speed", leftDrive.getTargetSpeed());
+			SmartDashboard.putNumber("Left speed", leftDrive.getTargetSpeed());
+			if(Math.abs(displacementDifference) > 100) {
+				double deltaSpeed = displacementDifference/(double)MAX_DIPLACEMENT_DIFFERENCE;
+				if(rightDisplacement > leftDisplacement) {
+					//setSpeed(leftDrive.getTargetSpeed() < rightDrive.getTargetSpeed() ? rightDrive.getTargetSpeed() : leftDrive.getTargetSpeed(), 
+					//		rightDrive.getTargetSpeed());
+					//addToSpeed(0.01, -0.01);
+				} else {
+					//setSpeed(rightDrive.getTargetSpeed() < leftDrive.getTargetSpeed() ? leftDrive.getTargetSpeed() : rightDrive.getTargetSpeed(), 
+					//		leftDrive.getTargetSpeed());
+					//addToSpeed(-0.01, 0.01);
+				}
+			}
+			
+			leftDone = Math.abs(leftDisplacement) > encoderTicks;
+			rightDone = Math.abs(rightDisplacement) > encoderTicks;
+			
+			Timer.delay(0.05);
 		} while (!leftDone || !rightDone);
 
 		setSpeed(0.0);
@@ -64,13 +91,15 @@ public class RobotDrive {
 		setSpeed(0.0);
 	}
 
-	public void pointTurn(double degrees, double speed) {
-		double startingAngle = gyro.getAngle();
-
-		if (speed > 0)setSpeed(speed, -speed);
-		else setSpeed(-speed, speed);
+	public void turn(double degrees, double speed) {
+		setSpeed(speed, -speed);
 		
-		while (gyro.getAngle() - startingAngle < degrees) Timer.delay(0.01);
+		long leftStartingTicks = leftDrive.encoder.get();
+		long rightStartingTicks = rightDrive.encoder.get();
+		
+		while((Math.abs(leftDrive.encoder.get() - leftStartingTicks) + Math.abs(rightDrive.encoder.get() - rightStartingTicks))/2 < (degrees/90.0)*NINETY_DEGREE_TURN) {
+			Timer.delay(0.01);
+		}
 		
 		setSpeed(0.0);
 	}

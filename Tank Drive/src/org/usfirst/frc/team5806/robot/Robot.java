@@ -1,5 +1,7 @@
 package org.usfirst.frc.team5806.robot;
 
+import org.usfirst.frc.team5806.robot.TargetTracker.ParticleReport;
+
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
@@ -21,7 +23,7 @@ public class Robot extends IterativeRobot {
 	private static final String CAMERA_NAME = "cam0";
 	private static final double[] SHOOTING_RANGE_FEET = {3.75, 4.25};
 	private static final double[] GOAL_CENTERED_COORDS = {500, 500};
-	private static final double GOAL_CENTERED_ERROR = 10;
+	private static final double GOAL_CENTERED_ERROR = 30;
 
 	private static final int AUTONOMOUS_GOAL_NUMBER = 1;
 		
@@ -78,17 +80,21 @@ public class Robot extends IterativeRobot {
 				new DriveTrain(new Talon(1), new Encoder(0, 1), 0), 
 				new DriveTrain(new Talon(0), new Encoder(2, 3), 0), 
 				sonars[0],
-				sonars[1],
-				new ADXRS450_Gyro());
-		
-		tracker = new TargetTracker();
+				sonars[1]);
 	}
 	
 	public void autonomousInit() {
-		double driveSpeed = 0.5;
-		double turnSpeed = 0.5;
+		tracker = new TargetTracker();
+		arm.lower();
 		
-		drive.moveDistance(100, driveSpeed);
+		double driveSpeed = 0.4;
+		double turnSpeed = 1;
+		
+		drive.moveDistance(147, driveSpeed);
+		drive.turn(90, turnSpeed);
+		drive.moveDistance(110, -driveSpeed);
+		drive.turn(90, turnSpeed);
+		drive.moveDistance(110, -driveSpeed);
 		
 		/*// Move to castle
 		if(AUTONOMOUS_GOAL_NUMBER == 1) {
@@ -110,26 +116,28 @@ public class Robot extends IterativeRobot {
 		}*/
 		
 		// Vision processing angle calibration
-		/*double[] targetCenter = new double[]{500, 500};
-		double[] goalCenter;
+		double[] targetCenter = new double[]{150, 155};
+		ParticleReport goalContour;
 		do {
-			double[][] centers = finder.getGoalCenters();
-			goalCenter = new double[]{Integer.MAX_VALUE, Integer.MAX_VALUE};
-			for(int a = 0; a < centers.length; a++) if(centers[a][0] < goalCenter[0]) goalCenter = centers[a];
 			
-			if(goalCenter[0] - targetCenter[0] > 0) drive.pointTurn(5, 0.3);
-			else drive.pointTurn(-5, 0.3);
+			goalContour = tracker.retrieveBestTarget();
+			if(goalContour.centerX - targetCenter[0] > 0) drive.turn(-5, turnSpeed);
+			else drive.turn(5, turnSpeed);
 			
-		} while(Math.sqrt(Math.pow(goalCenter[0] - targetCenter[0], 2) + Math.pow(goalCenter[1] - targetCenter[1], 2)) > GOAL_CENTERED_ERROR);
-		 */
-		// Shoot
-		/*roller.forward();
+		} while(Math.abs(goalContour.centerX - targetCenter[0]) > GOAL_CENTERED_ERROR);
+		
+		System.out.println("we made it");
+		
+		arm.raise();
+		Timer.delay(2);
+		roller.forward();
 		Timer.delay(Roller.TIME_TO_FULL_SPEED_MILLIS / 1000.0);
 		arm.push();
-		Timer.delay(2);*/
+		Timer.delay(2);
 	}
 	
 	public void teleopInit() {
+		tracker = new TargetTracker();
 		limitedJoyL = 0.1;
 		limitedJoyR = 0.1;
 	}
@@ -176,7 +184,8 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("Right Encoder", drive.rightDrive.encoder.get());
 		SmartDashboard.putNumber("Left target", drive.leftDrive.getTargetSpeed());
 		SmartDashboard.putNumber("Right target", drive.rightDrive.getTargetSpeed());
-		tracker.retrieveBestTarget();
+		ParticleReport best = tracker.retrieveBestTarget();
+		
 		//finder.getGoalCenters();
 		//SmartDashboard.putNumber("Gyro angle", drive.gyro.getAngle());
 		//SmartDashboard.putBoolean("In shooting range", inShootingRange());
