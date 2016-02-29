@@ -1,3 +1,22 @@
 # DriveSystem
 
+**5806 Horace Mann Basement Lions**  
+![alt text](https://avatars3.githubusercontent.com/u/15164506?v=3&s=200 "Basement Lions")
+
 Team 5806's drive system for FRC Stronghold.
+
+Made in eclipse using the wpilib FRC plugin.  
+All code is nicely object-oriented into _**10**_ seperate classes, making the code easier to understand and use. 
+
+Includes:
+- Arm control
+- Button handling
+- Sensor handling
+- Ultrasound handling
+- Motor control
+- Autonomous
+- Regular control
+- Vision processing
+- Printing of information to SmartDashboard
+ 
+The code is customisable by changing the constants marked in each class.
