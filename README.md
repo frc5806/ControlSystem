@@ -21,3 +21,7 @@ Includes:
  
 The code is customisable by changing the constants marked in each class.  
 The code is located in [Tank Drive/src/org/usfirst/frc/team5806/robot](Tank Drive/src/org/usfirst/frc/team5806/robot "Code Folder")
+
+### Installation:
+You must have the wpilib Eclipse Plugin installed. Then, import the project into eclipse, build, and deploy to your roboRIO using the wpilib plugin deploy function.  
+Make sure you have your constants set correctly.
