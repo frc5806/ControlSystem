@@ -38,7 +38,7 @@ public class TargetTracker {
 	// general scoring
 	final double AREA_MINIMUM = 1; // Default Area minimum for particle as percentage of total area (pixels are hard with NIVision)
 	final double AREA_MAXIMUM = 100.0; // Max area by same measure
-//	private final double MIN_SCORE = 75;
+	// private final double MIN_SCORE = 75;
 	NIVision.ParticleFilterCriteria2 areaFilterCritera[] = new NIVision.ParticleFilterCriteria2[1];
 	NIVision.ParticleFilterOptions2 filterOptions = new NIVision.ParticleFilterOptions2(0,0,1,1);
 	

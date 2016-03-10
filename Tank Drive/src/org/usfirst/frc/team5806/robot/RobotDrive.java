@@ -36,8 +36,6 @@ public class RobotDrive {
 	public void setSpeed(double leftSpeed, double rightSpeed) {
 		leftDrive.setTargetSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND*leftSpeed);
 		rightDrive.setTargetSpeed(-DriveTrain.MAXIMUM_ENCODERS_PER_SECOND*rightSpeed);
-		//leftDrive.motorController.set(-leftSpeed);
-		//rightDrive.motorController.set(rightSpeed);
 	}
 	
 	public void addToSpeed(double leftAdd, double rightAdd) {
@@ -47,23 +45,15 @@ public class RobotDrive {
 
 	public void move(int encoderTicks, double speed) {
 		setSpeed(speed);
-		SmartDashboard.putNumber("Starting encoder ticks", encoderTicks);
+
 		long leftStartingTicks = leftDrive.encoder.get();
 		long rightStartingTicks = rightDrive.encoder.get();
-
 		boolean leftDone, rightDone;
-		int leftDisplacement, rightDisplacement;
-		int displacementDifference;
 		do {
-			SmartDashboard.putNumber("Left progress", leftDrive.encoder.get() - leftStartingTicks);
-			SmartDashboard.putNumber("Right progress", rightDrive.encoder.get() - rightStartingTicks);
-			leftDisplacement = (int) (leftDrive.encoder.get() - leftStartingTicks);
-			rightDisplacement = (int) (rightDrive.encoder.get() - rightStartingTicks);
+			int leftDisplacement = (int) (leftDrive.encoder.get() - leftStartingTicks);
+			int rightDisplacement = (int) (rightDrive.encoder.get() - rightStartingTicks);
 			
-			displacementDifference = leftDisplacement - rightDisplacement;
-			SmartDashboard.putNumber("difference displacement", displacementDifference);
-			SmartDashboard.putNumber("Right speed", leftDrive.getTargetSpeed());
-			SmartDashboard.putNumber("Left speed", leftDrive.getTargetSpeed());
+			int displacementDifference = leftDisplacement - rightDisplacement;
 			if(Math.abs(displacementDifference) > 100) {
 				double deltaSpeed = displacementDifference/(double)MAX_DIPLACEMENT_DIFFERENCE;
 				if(rightDisplacement > leftDisplacement) {

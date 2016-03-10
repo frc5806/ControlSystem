@@ -65,8 +65,6 @@ public class Robot extends IterativeRobot {
 		
 		joystick = new Joystick(1);
 		
-		//finder = new GoalFinder(new USBCamera(CAMERA_NAME)); 
-		
 		compressor = new Compressor();
 		compressor.start();
 
@@ -81,10 +79,11 @@ public class Robot extends IterativeRobot {
 				new DriveTrain(new Talon(0), new Encoder(2, 3), 0), 
 				sonars[0],
 				sonars[1]);
+
+		tracker = new TargetTracker();
 	}
 	
 	public void autonomousInit() {
-		tracker = new TargetTracker();
 		arm.lower();
 		
 		double driveSpeed = 0.4;
@@ -95,25 +94,6 @@ public class Robot extends IterativeRobot {
 		drive.moveDistance(110, -driveSpeed);
 		drive.turn(90, turnSpeed);
 		drive.moveDistance(110, -driveSpeed);
-		
-		/*// Move to castle
-		if(AUTONOMOUS_GOAL_NUMBER == 1) {
-			drive.moveDistance(10000, driveSpeed);
-			drive.pointTurn(90, turnSpeed);
-		} else if(AUTONOMOUS_GOAL_NUMBER == 2) {
-			drive.moveDistance(10000, driveSpeed);
-			drive.pointTurn(90, turnSpeed);
-			drive.moveDistance(10000, driveSpeed);
-			drive.pointTurn(-90, turnSpeed);
-			drive.moveDistance(10000, driveSpeed);
-		} else {
-			drive.moveDistance(10000, driveSpeed);
-			drive.pointTurn(90, turnSpeed);
-			drive.moveDistance(10000, driveSpeed);
-			drive.pointTurn(-90, turnSpeed);
-			drive.moveDistance(10000, driveSpeed);
-			drive.pointTurn(-90, turnSpeed);
-		}*/
 		
 		// Vision processing angle calibration
 		double[] targetCenter = new double[]{150, 155};
@@ -126,8 +106,6 @@ public class Robot extends IterativeRobot {
 			
 		} while(Math.abs(goalContour.centerX - targetCenter[0]) > GOAL_CENTERED_ERROR);
 		
-		System.out.println("we made it");
-		
 		arm.raise();
 		Timer.delay(2);
 		roller.forward();
@@ -137,7 +115,6 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void teleopInit() {
-		tracker = new TargetTracker();
 		limitedJoyL = 0.1;
 		limitedJoyR = 0.1;
 	}
@@ -185,10 +162,6 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("Left target", drive.leftDrive.getTargetSpeed());
 		SmartDashboard.putNumber("Right target", drive.rightDrive.getTargetSpeed());
 		ParticleReport best = tracker.retrieveBestTarget();
-		
-		//finder.getGoalCenters();
-		//SmartDashboard.putNumber("Gyro angle", drive.gyro.getAngle());
-		//SmartDashboard.putBoolean("In shooting range", inShootingRange());
 	}
 
 	public void disableInit() {
