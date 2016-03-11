@@ -39,6 +39,7 @@ public class Robot extends IterativeRobot {
 	Compressor compressor;
 	Roller roller;
 	Arm arm;
+	Stick stick;
 	
 	ButtonHandler buttonHandler;
 
@@ -75,12 +76,14 @@ public class Robot extends IterativeRobot {
 		buttonHandler = new ButtonHandler(joystick);
 		
 		drive = new RobotDrive(
-				new DriveTrain(new Talon(1), new Encoder(0, 1), 0), 
-				new DriveTrain(new Talon(0), new Encoder(2, 3), 0), 
+				new DriveTrain(new Talon(1), new Encoder(0, 1), 0, true), 
+				new DriveTrain(new Talon(0), new Encoder(2, 3), 0, false), 
 				sonars[0],
 				sonars[1]);
 
 		tracker = new TargetTracker();
+		
+		stick = new Stick(3);
 	}
 	
 	public void autonomousInit() {
@@ -145,6 +148,17 @@ public class Robot extends IterativeRobot {
 			arm.lower();
 		}
 		
+		if(buttonHandler.isDown('L')) {
+			SmartDashboard.putString("Stick state", "lower");
+			stick.lower();
+		} else if (buttonHandler.isDown('R')) {
+			stick.lift();
+			SmartDashboard.putString("Stick state", "lift");
+		} else {
+			stick.stay();
+			SmartDashboard.putString("Stick state", "stay");
+		}
+		
 		// Using exponential moving averages for joystick limiting
 		double desiredL = joystick.getRawAxis(1);
 		double desiredR = joystick.getRawAxis(5);
@@ -152,15 +166,16 @@ public class Robot extends IterativeRobot {
 		double errorR = desiredR - limitedJoyR;
 		limitedJoyL += errorL * rampCoefficient;
 		limitedJoyR += errorR * rampCoefficient;
-		drive.setSpeed(desiredL, desiredR);
+		if(Math.abs(desiredL) > 0.15) drive.leftDrive.motorController.set(-desiredL);
+		else drive.leftDrive.motorController.set(0);
+		if(Math.abs(desiredR) > 0.15) drive.rightDrive.motorController.set(desiredR);
+		else drive.rightDrive.motorController.set(0);
 
 		// Update dashboard
 		SmartDashboard.putNumber("Left Sonar", sonars[0].getMM());
 		SmartDashboard.putNumber("Right Sonar", sonars[1].getMM());
 		SmartDashboard.putNumber("Left Encoder", drive.leftDrive.encoder.get());
 		SmartDashboard.putNumber("Right Encoder", drive.rightDrive.encoder.get());
-		SmartDashboard.putNumber("Left target", drive.leftDrive.getTargetSpeed());
-		SmartDashboard.putNumber("Right target", drive.rightDrive.getTargetSpeed());
 		ParticleReport best = tracker.retrieveBestTarget();
 	}
 
