@@ -14,8 +14,10 @@ public class DriveTrain extends PIDSubsystem {
 	public Encoder encoder;
 	
 	private double targetEncoderSpeed;
+	private boolean isReversed;
 	
-	public DriveTrain(Talon motorController, Encoder encoder, int startingEncoderSpeed) {
+	// ---------------------- Public Methods ------------------------------
+	public DriveTrain(Talon motorController, Encoder encoder, int startingSpeed, boolean isReversed) {
 		super("DriveTrain", 1, 0, 0);
 		
 		setAbsoluteTolerance(0.05);
@@ -23,30 +25,40 @@ public class DriveTrain extends PIDSubsystem {
 		
 		this.motorController = motorController;
 		this.encoder = encoder;
-		this.targetEncoderSpeed = startingEncoderSpeed;
-	}
-	
-	public double getTargetSpeed() { return targetEncoderSpeed; }
-	public void setTargetSpeed(double targetEncoderSpeed) {
-		if(targetEncoderSpeed > MAXIMUM_ENCODERS_PER_SECOND*0.4) targetEncoderSpeed = 0.4*MAXIMUM_ENCODERS_PER_SECOND;
-		if(targetEncoderSpeed < -MAXIMUM_ENCODERS_PER_SECOND*0.4) targetEncoderSpeed = -0.4*MAXIMUM_ENCODERS_PER_SECOND;
+		this.isReversed = isReversed;
 		
-		this.targetEncoderSpeed = targetEncoderSpeed;
+		setTargetSpeed(startingSpeed);
 	}
 	
+	public double getTargetSpeed() { 
+		return targetEncoderSpeed; 
+	}
+	
+	public void setTargetSpeed(double targetSpeed) {
+		this.targetEncoderSpeed = targetSpeed*MAXIMUM_ENCODERS_PER_SECOND;
+		
+		// If this side is reversed, then reverse the target speeds
+		if(isReversed) this.targetEncoderSpeed *= -1;
+	}
+	
+	// ---------------------- Protected Methods ------------------------------
 	@Override
 	protected void initDefaultCommand() {}
 	
 	@Override
 	protected double returnPIDInput() {
 		long currentEncoderTicks = encoder.get();
+		
 		Timer.delay(SAMPLE_PERIOD_MILLIS/1000.0);
+		
 		double encoderSpeed = (encoder.get() - currentEncoderTicks) / (double)(SAMPLE_PERIOD_MILLIS / 1000.0f);
+		if(isReversed) encoderSpeed *= -1; // Reversal
 		return (targetEncoderSpeed - encoderSpeed) / MAXIMUM_ENCODERS_PER_SECOND;
 	}
 
 	@Override
 	protected void usePIDOutput(double output) {
+		// Threshold
 		if(Math.abs(targetEncoderSpeed) > MAXIMUM_ENCODERS_PER_SECOND * 0.15) motorController.pidWrite(output);
 		else motorController.set(0);
 	}
