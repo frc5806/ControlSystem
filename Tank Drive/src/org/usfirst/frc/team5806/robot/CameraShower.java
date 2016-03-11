@@ -7,7 +7,8 @@ public class CameraShower implements Runnable {
 	}
 	@Override
 	public void run() {
-		tracker.showImage();
+		while(true) {
+			tracker.showImage();
+		}
 	}
-
 }

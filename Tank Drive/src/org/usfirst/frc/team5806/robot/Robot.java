@@ -93,10 +93,10 @@ public class Robot extends IterativeRobot {
 			
 			double driveSpeed = -0.4;
 			double creepSpeed = -0.3;
-			double turnSpeed = 0.8;
+			double turnSpeed = 0.5;
 			
-			drive.moveDistance(147, driveSpeed);
-			drive.turn(90, turnSpeed);
+			drive.moveDistance(20000, driveSpeed);
+			/*drive.turn(90, turnSpeed);
 			drive.moveDistance(110, -driveSpeed);
 			drive.turn(90, turnSpeed);
 			drive.moveDistance(110, -driveSpeed);
@@ -121,7 +121,7 @@ public class Robot extends IterativeRobot {
 			roller.forward();
 			Timer.delay(Roller.TIME_TO_FULL_SPEED_MILLIS / 1000.0);
 			arm.push();
-			Timer.delay(2);
+			Timer.delay(2);*/
 		} catch(Exception e) {
 			drive.setSpeed(0);
 			arm.lower();

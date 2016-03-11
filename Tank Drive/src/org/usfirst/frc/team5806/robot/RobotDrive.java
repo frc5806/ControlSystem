@@ -57,27 +57,20 @@ public class RobotDrive {
 			
 			int displacementDifference = leftDisplacement - rightDisplacement;
 			if(Math.abs(displacementDifference) > 5) {
+				double maxDisplacementDifference = 150;
+				double speedVariance = 0.3 * Math.abs(displacementDifference) / maxDisplacementDifference;
+				
 				if(rightDisplacement > leftDisplacement) {
-					if(leftDrive.getTargetSpeed() < rightDrive.getTargetSpeed()) {
-						setSpeed(rightDrive.getTargetSpeed(), rightDrive.getTargetSpeed());
-					}
-					if(leftDrive.getTargetSpeed() - rightDrive.getTargetSpeed() < 0.4) {
-						addToSpeed(0.01, -0.01);
-					}
+					setSpeed(speed + speedVariance, speed - speedVariance);
 				} else {
-					if(rightDrive.getTargetSpeed() < leftDrive.getTargetSpeed()) {
-						setSpeed(leftDrive.getTargetSpeed(), leftDrive.getTargetSpeed());
-					}
-					if(rightDrive.getTargetSpeed() - leftDrive.getTargetSpeed() < 0.4) {
-						addToSpeed(-0.01, 0.01);
-					}
+					setSpeed(speed - speedVariance, speed + speedVariance);
 				}
 			}
 			
 			leftDone = Math.abs(leftDisplacement) > encoderTicks;
 			rightDone = Math.abs(rightDisplacement) > encoderTicks;
 			
-			Timer.delay(0.1);
+			Timer.delay(0.01);
 		} while (!leftDone || !rightDone);
 
 		setSpeed(0.0);
