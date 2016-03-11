@@ -79,7 +79,7 @@ public class Roller extends PIDSubsystem {
 	@Override
 	protected void usePIDOutput(double output) {
 		if(state == RollerState.STOPPED) motorController.set(0);
-		else if(state == RollerState.FORWARDS) motorController.set(-0.8);
+		else if(state == RollerState.FORWARDS) motorController.set(-1);
 		else motorController.set(0.23);
 		
 		// Update speed
