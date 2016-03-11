@@ -131,6 +131,9 @@ public class Robot extends IterativeRobot {
 	public void teleopInit() {
 		limitedJoyL = 0.1;
 		limitedJoyR = 0.1;
+		
+		Thread t = new Thread(new CameraShower(tracker));
+		t.start();
 	}
 
 	public void teleopPeriodic() {

@@ -87,7 +87,6 @@ public class TargetTracker {
 	Image frame;
 	Image binaryFrame;
 	
-	
 	public TargetTracker()
 	{
 		camera = new USBCamera("cam0");
