@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -70,14 +71,14 @@ public class Robot extends IterativeRobot {
 		compressor.start();
 
 		arm = new Arm(new DoubleSolenoid(6, 7), new DoubleSolenoid(0, 1));
-		roller = new Roller(new Talon(2), new MagnetSensor(4));
+		roller = new Roller(new Victor(2), new MagnetSensor(4));
 		roller.enable();
 		
 		buttonHandler = new ButtonHandler(joystick);
 		
 		drive = new RobotDrive(
-				new DriveTrain(new Talon(1), new Encoder(0, 1), 0, true), 
-				new DriveTrain(new Talon(0), new Encoder(2, 3), 0, false), 
+				new DriveTrain(new Victor(1), new Encoder(2, 3, true), 0, true), 
+				new DriveTrain(new Victor(0), new Encoder(0, 1, true), 0, false), 
 				sonars[0],
 				sonars[1]);
 
@@ -87,34 +88,44 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void autonomousInit() {
-		arm.lower();
-		
-		double driveSpeed = 0.4;
-		double turnSpeed = 1;
-		
-		drive.moveDistance(147, driveSpeed);
-		drive.turn(90, turnSpeed);
-		drive.moveDistance(110, -driveSpeed);
-		drive.turn(90, turnSpeed);
-		drive.moveDistance(110, -driveSpeed);
-		
-		// Vision processing angle calibration
-		double[] targetCenter = new double[]{150, 155};
-		ParticleReport goalContour;
-		do {
+		try{
+			arm.lower();
 			
-			goalContour = tracker.retrieveBestTarget();
-			if(goalContour.centerX - targetCenter[0] > 0) drive.turn(-5, turnSpeed);
-			else drive.turn(5, turnSpeed);
+			double driveSpeed = -0.4;
+			double creepSpeed = -0.3;
+			double turnSpeed = 0.8;
 			
-		} while(Math.abs(goalContour.centerX - targetCenter[0]) > GOAL_CENTERED_ERROR);
-		
-		arm.raise();
-		Timer.delay(2);
-		roller.forward();
-		Timer.delay(Roller.TIME_TO_FULL_SPEED_MILLIS / 1000.0);
-		arm.push();
-		Timer.delay(2);
+			drive.moveDistance(147, driveSpeed);
+			drive.turn(90, turnSpeed);
+			drive.moveDistance(110, -driveSpeed);
+			drive.turn(90, turnSpeed);
+			drive.moveDistance(110, -driveSpeed);
+			
+			// Vision processing angle calibration
+			double[] targetCenter = new double[]{150, 155};
+			ParticleReport goalContour;
+			do {
+				
+				goalContour = tracker.retrieveBestTarget();
+				if(goalContour.centerX - targetCenter[0] > 0) drive.turn(-5, turnSpeed);
+				else drive.turn(5, turnSpeed);
+				
+			} while(Math.abs(goalContour.centerX - targetCenter[0]) > GOAL_CENTERED_ERROR);
+			
+			while((sonars[0].getMM() + sonars[1].getMM()) / 2.0 > 100) {
+				drive.moveDistance(4, creepSpeed);
+			}
+			
+			arm.raise();
+			Timer.delay(2);
+			roller.forward();
+			Timer.delay(Roller.TIME_TO_FULL_SPEED_MILLIS / 1000.0);
+			arm.push();
+			Timer.delay(2);
+		} catch(Exception e) {
+			drive.setSpeed(0);
+			arm.lower();
+		}
 	}
 	
 	public void teleopInit() {
@@ -166,17 +177,31 @@ public class Robot extends IterativeRobot {
 		double errorR = desiredR - limitedJoyR;
 		limitedJoyL += errorL * rampCoefficient;
 		limitedJoyR += errorR * rampCoefficient;
-		if(Math.abs(desiredL) > 0.15) drive.leftDrive.motorController.set(-desiredL);
+		
+		if(Math.abs(desiredL) > 0.25) drive.leftDrive.motorController.set(-desiredL);
 		else drive.leftDrive.motorController.set(0);
-		if(Math.abs(desiredR) > 0.15) drive.rightDrive.motorController.set(desiredR);
+		if(Math.abs(desiredR) > 0.25) drive.rightDrive.motorController.set(desiredR);
 		else drive.rightDrive.motorController.set(0);
+		
+		//drive.leftDrive.getPIDController().setPID(1, 0, 0);
 
-		// Update dashboard
+		// Update dashboardasdf
 		SmartDashboard.putNumber("Left Sonar", sonars[0].getMM());
 		SmartDashboard.putNumber("Right Sonar", sonars[1].getMM());
 		SmartDashboard.putNumber("Left Encoder", drive.leftDrive.encoder.get());
 		SmartDashboard.putNumber("Right Encoder", drive.rightDrive.encoder.get());
-		ParticleReport best = tracker.retrieveBestTarget();
+		SmartDashboard.putNumber("Left Feedback", drive.leftDrive.feedback);
+		SmartDashboard.putNumber("Right Feedback", drive.rightDrive.feedback);
+		SmartDashboard.putNumber("Left Target Encoder", drive.leftDrive.targetEncoderSpeed);
+		SmartDashboard.putNumber("Right Target Encoder", drive.rightDrive.targetEncoderSpeed);
+		SmartDashboard.putNumber("Left Current Encoder", drive.leftDrive.encoderSpeed);
+		SmartDashboard.putNumber("Right Current Encoder", drive.rightDrive.encoderSpeed);
+		SmartDashboard.putNumber("Left Current", drive.leftDrive.motorController.get());
+		SmartDashboard.putNumber("Right Current", drive.rightDrive.motorController.get());
+		SmartDashboard.putNumber("Left Joystick", desiredL);
+		SmartDashboard.putNumber("Right Joystick", desiredR);
+		
+		//tracker.showImage();
 	}
 
 	public void disableInit() {

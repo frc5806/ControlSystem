@@ -1,9 +1,8 @@
 package org.usfirst.frc.team5806.robot;
 
 import edu.wpi.first.wpilibj.Talon;
-
+import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Roller extends PIDSubsystem {
 	private enum RollerState {
@@ -14,7 +13,7 @@ public class Roller extends PIDSubsystem {
 	public static final int MAXIMUM_RPM = 9000;
 	public static final int TIME_TO_FULL_SPEED_MILLIS = 1000;
 
-	Talon motorController;
+	Victor motorController;
 	public MagnetSensor encoder;
 	
 	double targetRPM;
@@ -23,7 +22,7 @@ public class Roller extends PIDSubsystem {
 	
 	RollerState state;
 	
-	public Roller(Talon motorController, MagnetSensor encoder) {
+	public Roller(Victor motorController, MagnetSensor encoder) {
 		super("Roller", 1, 0, 0);
 		
 		setAbsoluteTolerance(0.05);
@@ -71,8 +70,6 @@ public class Roller extends PIDSubsystem {
 		double rpm = encoder.getRPM(SAMPLE_PERIOD_MILLIS);
 		if(targetRPM < 0) rpm *= -1;
 
-		SmartDashboard.putNumber("Roller RPM", rpm);
-
 		return (currentTargetSpeed - rpm) / (double)MAXIMUM_RPM;
 	}
 
@@ -86,12 +83,6 @@ public class Roller extends PIDSubsystem {
 		long millisSince = System.currentTimeMillis() - startingMillis;
 		if(millisSince < TIME_TO_FULL_SPEED_MILLIS) currentTargetSpeed = (millisSince / (double)TIME_TO_FULL_SPEED_MILLIS) * targetRPM;
 		else currentTargetSpeed = targetRPM;
-		
-		SmartDashboard.putNumber("Millis since last update", millisSince);
-		SmartDashboard.putNumber("Current target speed", currentTargetSpeed);
-		SmartDashboard.putNumber("Overall target speed", targetRPM);
-		SmartDashboard.putNumber("PID Output", output);
-		SmartDashboard.putNumber("Robot State", state.ordinal());
 	}
 }
  

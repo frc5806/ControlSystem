@@ -3,22 +3,23 @@ package org.usfirst.frc.team5806.robot;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveTrain extends PIDSubsystem {
-	private static final int SAMPLE_PERIOD_MILLIS = 50;
-	public static final int MAXIMUM_ENCODERS_PER_SECOND = 100000;
+	private static final int SAMPLE_PERIOD_MILLIS = 100;
+	public static final int MAXIMUM_ENCODERS_PER_SECOND = 1000;
 	
-	public Talon motorController;
+	public Victor motorController;
 	public Encoder encoder;
 	
-	private double targetEncoderSpeed;
+	public double targetEncoderSpeed, encoderSpeed, feedback;
 	private boolean isReversed;
 	
+	
 	// ---------------------- Public Methods ------------------------------
-	public DriveTrain(Talon motorController, Encoder encoder, int startingSpeed, boolean isReversed) {
-		super("DriveTrain", 1, 0, 0);
+	public DriveTrain(Victor motorController, Encoder encoder, int startingSpeed, boolean isReversed) {
+		super("DriveTrain", 1, 0, 0.2);
 		
 		setAbsoluteTolerance(0.05);
 		getPIDController().setContinuous(false);
@@ -31,7 +32,8 @@ public class DriveTrain extends PIDSubsystem {
 	}
 	
 	public double getTargetSpeed() { 
-		return targetEncoderSpeed; 
+		if(isReversed )return -targetEncoderSpeed / (double) MAXIMUM_ENCODERS_PER_SECOND;
+		else return targetEncoderSpeed / (double) MAXIMUM_ENCODERS_PER_SECOND;
 	}
 	
 	public void setTargetSpeed(double targetSpeed) {
@@ -51,16 +53,18 @@ public class DriveTrain extends PIDSubsystem {
 		
 		Timer.delay(SAMPLE_PERIOD_MILLIS/1000.0);
 		
-		double encoderSpeed = (encoder.get() - currentEncoderTicks) / (double)(SAMPLE_PERIOD_MILLIS / 1000.0f);
-		if(isReversed) encoderSpeed *= -1; // Reversal
-		return (targetEncoderSpeed - encoderSpeed) / MAXIMUM_ENCODERS_PER_SECOND;
+		encoderSpeed = (encoder.get() - currentEncoderTicks) / (double)(SAMPLE_PERIOD_MILLIS / 1000.0f);
+		//if(isReversed) encoderSpeed *= -1; // Reversal
+		feedback = (targetEncoderSpeed - encoderSpeed) / (double)MAXIMUM_ENCODERS_PER_SECOND;
+		return feedback;
 	}
 
 	@Override
 	protected void usePIDOutput(double output) {
 		// Threshold
-		if(Math.abs(targetEncoderSpeed) > MAXIMUM_ENCODERS_PER_SECOND * 0.15) motorController.pidWrite(output);
-		else motorController.set(0);
+		//if(Math.abs(targetEncoderSpeed) > MAXIMUM_ENCODERS_PER_SECOND * 0.15) motorController.pidWrite(output);
+		//else motorController.set(0);
+		motorController.set((double)targetEncoderSpeed / (double)MAXIMUM_ENCODERS_PER_SECOND);
 	}
 
 }

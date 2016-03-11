@@ -1,6 +1,7 @@
 package org.usfirst.frc.team5806.robot;
 
 import java.util.Comparator;
+
 import java.util.Vector;
 
 import com.ni.vision.NIVision;
@@ -12,7 +13,6 @@ import com.ni.vision.NIVision.ShapeMode;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.vision.USBCamera;
 
 /**
@@ -100,6 +100,11 @@ public class TargetTracker {
 		areaFilterCritera[0] = new NIVision.ParticleFilterCriteria2(
 				NIVision.MeasurementType.MT_AREA_BY_IMAGE_AREA, AREA_MINIMUM, AREA_MAXIMUM, 0, 0);
 	}
+	
+	public void showImage() {
+		camera.getImage(frame);
+		CameraServer.getInstance().setImage(frame);
+	};
 	
 	/**
 	 * Generates complete scores for all found targets,

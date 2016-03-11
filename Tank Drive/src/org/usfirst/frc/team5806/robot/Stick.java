@@ -1,11 +1,12 @@
 package org.usfirst.frc.team5806.robot;
 
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.Victor;
 
 public class Stick {
-	Talon motorController;
+	Victor motorController;
 	public Stick(int controllerChannel) {
-		motorController = new Talon(controllerChannel);
+		motorController = new Victor(controllerChannel);
 	}
 	
 	public void lift() {

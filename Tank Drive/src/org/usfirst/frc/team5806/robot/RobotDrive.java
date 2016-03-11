@@ -1,6 +1,5 @@
 package org.usfirst.frc.team5806.robot;
-
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+	
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
@@ -34,13 +33,14 @@ public class RobotDrive {
 	}
 
 	public void setSpeed(double leftSpeed, double rightSpeed) {
-		leftDrive.setTargetSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND*leftSpeed);
-		rightDrive.setTargetSpeed(-DriveTrain.MAXIMUM_ENCODERS_PER_SECOND*rightSpeed);
+		leftDrive.setTargetSpeed(leftSpeed);
+		rightDrive.setTargetSpeed(rightSpeed);
+		SmartDashboard.putNumber("Left Target", leftDrive.getTargetSpeed());
+		SmartDashboard.putNumber("Right Target", rightDrive.getTargetSpeed());
 	}
 	
 	public void addToSpeed(double leftAdd, double rightAdd) {
-		leftDrive.setTargetSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND*leftAdd + leftDrive.getTargetSpeed());
-		rightDrive.setTargetSpeed(DriveTrain.MAXIMUM_ENCODERS_PER_SECOND*rightAdd + rightDrive.getTargetSpeed());
+		setSpeed(leftAdd + leftDrive.getTargetSpeed(), rightAdd + rightDrive.getTargetSpeed());
 	}
 
 	public void move(int encoderTicks, double speed) {
@@ -50,27 +50,34 @@ public class RobotDrive {
 		long rightStartingTicks = rightDrive.encoder.get();
 		boolean leftDone, rightDone;
 		do {
-			int leftDisplacement = (int) (leftDrive.encoder.get() - leftStartingTicks);
-			int rightDisplacement = (int) (rightDrive.encoder.get() - rightStartingTicks);
+			int leftDisplacement = (int) -(leftDrive.encoder.get() - leftStartingTicks);
+			int rightDisplacement = (int) -(rightDrive.encoder.get() - rightStartingTicks);
+			SmartDashboard.putNumber("Left dist", leftDisplacement);
+			SmartDashboard.putNumber("Right dist", rightDisplacement);
 			
 			int displacementDifference = leftDisplacement - rightDisplacement;
-			if(Math.abs(displacementDifference) > 100) {
-				double deltaSpeed = displacementDifference/(double)MAX_DIPLACEMENT_DIFFERENCE;
+			if(Math.abs(displacementDifference) > 5) {
 				if(rightDisplacement > leftDisplacement) {
-					//setSpeed(leftDrive.getTargetSpeed() < rightDrive.getTargetSpeed() ? rightDrive.getTargetSpeed() : leftDrive.getTargetSpeed(), 
-					//		rightDrive.getTargetSpeed());
-					//addToSpeed(0.01, -0.01);
+					if(leftDrive.getTargetSpeed() < rightDrive.getTargetSpeed()) {
+						setSpeed(rightDrive.getTargetSpeed(), rightDrive.getTargetSpeed());
+					}
+					if(leftDrive.getTargetSpeed() - rightDrive.getTargetSpeed() < 0.4) {
+						addToSpeed(0.01, -0.01);
+					}
 				} else {
-					//setSpeed(rightDrive.getTargetSpeed() < leftDrive.getTargetSpeed() ? leftDrive.getTargetSpeed() : rightDrive.getTargetSpeed(), 
-					//		leftDrive.getTargetSpeed());
-					//addToSpeed(-0.01, 0.01);
+					if(rightDrive.getTargetSpeed() < leftDrive.getTargetSpeed()) {
+						setSpeed(leftDrive.getTargetSpeed(), leftDrive.getTargetSpeed());
+					}
+					if(rightDrive.getTargetSpeed() - leftDrive.getTargetSpeed() < 0.4) {
+						addToSpeed(-0.01, 0.01);
+					}
 				}
 			}
 			
 			leftDone = Math.abs(leftDisplacement) > encoderTicks;
 			rightDone = Math.abs(rightDisplacement) > encoderTicks;
 			
-			Timer.delay(0.05);
+			Timer.delay(0.1);
 		} while (!leftDone || !rightDone);
 
 		setSpeed(0.0);
