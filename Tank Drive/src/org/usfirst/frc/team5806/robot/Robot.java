@@ -90,30 +90,38 @@ public class Robot extends IterativeRobot {
 	public void autonomousInit() {
 		try{
 			arm.lower();
+			Timer.delay(0.5);
 			
-			double driveSpeed = -0.4;
+			double driveSpeed = -0.8;
 			double creepSpeed = -0.3;
-			double turnSpeed = 0.5;
+			double turnSpeed = 0.6;
 			
-			drive.moveDistance(20000, driveSpeed);
-			/*drive.turn(90, turnSpeed);
-			drive.moveDistance(110, -driveSpeed);
+			double delay = 0.2;
+			
+			drive.moveDistance(220, -driveSpeed);
+			
+			/*Timer.delay(delay);
+			drive.turn(90, -turnSpeed);
+			Timer.delay(delay);
+			drive.moveDistance(120, driveSpeed);
+			Timer.delay(delay);
 			drive.turn(90, turnSpeed);
-			drive.moveDistance(110, -driveSpeed);
+			Timer.delay(delay);
+			drive.moveDistance(90, driveSpeed);*/
 			
 			// Vision processing angle calibration
+			/*int iterations = 0;
 			double[] targetCenter = new double[]{150, 155};
 			ParticleReport goalContour;
 			do {
-				
 				goalContour = tracker.retrieveBestTarget();
 				if(goalContour.centerX - targetCenter[0] > 0) drive.turn(-5, turnSpeed);
 				else drive.turn(5, turnSpeed);
 				
-			} while(Math.abs(goalContour.centerX - targetCenter[0]) > GOAL_CENTERED_ERROR);
+			} while(iterations++ < 20 && Math.abs(goalContour.centerX - targetCenter[0]) > GOAL_CENTERED_ERROR);*/
 			
-			while((sonars[0].getMM() + sonars[1].getMM()) / 2.0 > 100) {
-				drive.moveDistance(4, creepSpeed);
+			/*while((sonars[0].getMM() + sonars[1].getMM()) / 2.0 > 350) {
+				drive.moveDistance(10, creepSpeed);
 			}
 			
 			arm.raise();
