@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class RobotDrive {
 	public static final double WHEEL_DIAMETER = 7.65;
 	public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
-	public static final long TICKS_PER_MOTOR_REV = 64;
+	public static final long TICKS_PER_MOTOR_REV = 62;
 	public static final double MOTOR_REVS_PER_WHEEL_REV = 1 / 0.28;
 	public static final long TICKS_PER_WHEEL_REV = (long)(TICKS_PER_MOTOR_REV * MOTOR_REVS_PER_WHEEL_REV);
 	public static final long TICKS_PER_INCH = (long)((double)TICKS_PER_WHEEL_REV / WHEEL_CIRCUMFERENCE);
@@ -42,35 +42,54 @@ public class RobotDrive {
 	public void addToSpeed(double leftAdd, double rightAdd) {
 		setSpeed(leftAdd + leftDrive.getTargetSpeed(), rightAdd + rightDrive.getTargetSpeed());
 	}
-
+	
+	
+	// TODO: check directions of encoders in teleop
+	// 
 	public void move(int encoderTicks, double speed) {
+		// Set speed to mean speed
 		setSpeed(speed);
-
+		
+		// Get beginning encoder vals
 		long leftStartingTicks = leftDrive.encoder.get();
 		long rightStartingTicks = rightDrive.encoder.get();
+		
+		// Each bool tells us if that side has moved far enough
+		// When both have moved far enough, we stop moving
 		boolean leftDone, rightDone;
 		do {
+			// Get total diplacements
 			int leftDisplacement = (int) -(leftDrive.encoder.get() - leftStartingTicks);
 			int rightDisplacement = (int) -(rightDrive.encoder.get() - rightStartingTicks);
-			SmartDashboard.putNumber("Left dist", leftDisplacement);
-			SmartDashboard.putNumber("Right dist", rightDisplacement);
+			SmartDashboard.putNumber("Left distance", leftDisplacement);
+			SmartDashboard.putNumber("Right distance", rightDisplacement);
 			
+			// Difference between the two sides diplacement
 			int displacementDifference = leftDisplacement - rightDisplacement;
 			if(Math.abs(displacementDifference) > 5) {
+				// Past this displacement, we just go at our max variance
 				double maxDisplacementDifference = 150;
-				double speedVariance = 0.3 * Math.abs(displacementDifference) / maxDisplacementDifference;
+				double maxVariance = 0.4;
 				
+				// Our variance is the ratio of difference in displacement to max difference
+				double speedVariance = maxVariance * Math.abs(displacementDifference) / maxDisplacementDifference;
+				SmartDashboard.putNumber("Speed Variance", speedVariance);
+				if(speedVariance > maxVariance) speedVariance = maxVariance;
+				
+				// If right side encoders have moved more forwards, then lessen the right side's motor value
 				if(rightDisplacement > leftDisplacement) {
+					SmartDashboard.putBoolean("Is right moving faster", true);
 					setSpeed(speed + speedVariance, speed - speedVariance);
 				} else {
+					SmartDashboard.putBoolean("Is right moving faster", false);
 					setSpeed(speed - speedVariance, speed + speedVariance);
 				}
 			}
 			
 			leftDone = Math.abs(leftDisplacement) > encoderTicks;
 			rightDone = Math.abs(rightDisplacement) > encoderTicks;
-			
-			Timer.delay(0.01);
+			Timer.delay(1);
+			//Timer.delay(0.01);
 		} while (!leftDone || !rightDone);
 
 		setSpeed(0.0);
