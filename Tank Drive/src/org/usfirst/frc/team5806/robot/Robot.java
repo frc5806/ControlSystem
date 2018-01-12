@@ -65,7 +65,7 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		sonars = new Sonar[] { new Sonar(3), new Sonar(0) };
 		
-		joystick = new Joystick(1);
+		joystick = new Joystick(0);
 		
 		compressor = new Compressor();
 		compressor.start();
@@ -146,53 +146,114 @@ public class Robot extends IterativeRobot {
 
 	public void teleopPeriodic() {
 		// Listen to controls
-		if(joystick.getRawAxis(2) > 0.7) {
-			roller.forward();
-		}
-		if(buttonHandler.readButton('X')) {
-			roller.reverse();
-		}
-		if(buttonHandler.readButton('Y')) {
-			roller.stop();
-		}
 		
-		if(joystick.getRawAxis(3) > 0.7) {
-			arm.push();
-		} else {
-			arm.retract();
-		}
+		boolean gamepad = false;
+		
+		if (gamepad) {
+			if(joystick.getRawAxis(2) > 0.7) {
+				roller.forward();
+			}
+			if(buttonHandler.readButton('X')) {
+				roller.reverse();
+			}
+			if(buttonHandler.readButton('Y')) {
+				roller.stop();
+			}
+			
+			if(joystick.getRawAxis(3) > 0.7) {
+				arm.push();
+			} else {
+				arm.retract();
+			}
 
-		if(buttonHandler.readButton('A')){
-			arm.raise();
-		}
-		
-		if(buttonHandler.readButton('B')) {
-			arm.lower();
-		}
-		
-		if(buttonHandler.isDown('L')) {
-			SmartDashboard.putString("Stick state", "lower");
-			stick.lower();
-		} else if (buttonHandler.isDown('R')) {
-			stick.lift();
-			SmartDashboard.putString("Stick state", "lift");
+			if(buttonHandler.readButton('A')){
+				arm.raise();
+			}
+			
+			if(buttonHandler.readButton('B')) {
+				arm.lower();
+			}
+			
+			if(buttonHandler.isDown('L')) {
+				SmartDashboard.putString("Stick state", "lower");
+				stick.lower();
+			} else if (buttonHandler.isDown('R')) {
+				stick.lift();
+				SmartDashboard.putString("Stick state", "lift");
+			} else {
+				stick.stay();
+				SmartDashboard.putString("Stick state", "stay");
+			}
+			
+			// Using exponential moving averages for joystick limiting
+			double desiredL = joystick.getRawAxis(1);
+			double desiredR = joystick.getRawAxis(5);
+			double errorL = desiredL - limitedJoyL;
+			double errorR = desiredR - limitedJoyR;
+			limitedJoyL += errorL * rampCoefficient;
+			limitedJoyR += errorR * rampCoefficient;
+			
+			if(Math.abs(desiredL) > 0.25) drive.leftDrive.motorController.set(-desiredL);
+			else drive.leftDrive.motorController.set(0);
+			if(Math.abs(desiredR) > 0.25) drive.rightDrive.motorController.set(desiredR);
+			else drive.rightDrive.motorController.set(0);
 		} else {
-			stick.stay();
-			SmartDashboard.putString("Stick state", "stay");
+			double turn = 0;
+			double forwards = 0;
+			
+			if (Math.abs(joystick.getRawAxis(2)) > 0.1) {
+				turn = joystick.getRawAxis(2);
+			} if (Math.abs(joystick.getRawAxis(1)) > 0.1) {
+				forwards = joystick.getRawAxis(1);
+			}
+						
+			if(buttonHandler.readButton('X')) {
+				roller.reverse();
+			}
+			if(buttonHandler.readButton('Y')) {
+				roller.stop();
+			}
+			
+			if(joystick.getRawAxis(3) > 0.7) {
+				arm.lower();
+			} else {
+				arm.raise();
+			}
+
+			if(buttonHandler.readButton('A')){
+				arm.push();
+				new java.util.Timer().schedule(
+					new java.util.TimerTask() {
+						@Override
+						public void run() {
+							arm.retract();
+						}
+					}, 500
+				);
+			} 
+			
+			if(buttonHandler.readButton('B')) {
+				roller.forward();
+			}
+			
+			if(buttonHandler.isDown('L')) {
+				SmartDashboard.putString("Stick state", "lower");
+				stick.lower();
+			} else if (buttonHandler.isDown('R')) {
+				stick.lift();
+				SmartDashboard.putString("Stick state", "lift");
+			} else {
+				stick.stay();
+				SmartDashboard.putString("Stick state", "stay");
+			}
+
+			double leftValue = forwards - turn;
+			double rightValue = forwards + turn;
+			
+			drive.leftDrive.motorController.set(-leftValue);
+			drive.rightDrive.motorController.set(rightValue);
 		}
 		
-		// Using exponential moving averages for joystick limiting
-		double desiredL = joystick.getRawAxis(1);
-		double desiredR = joystick.getRawAxis(5);
-		double errorL = desiredL - limitedJoyL;
-		double errorR = desiredR - limitedJoyR;
-		limitedJoyL += errorL * rampCoefficient;
-		limitedJoyR += errorR * rampCoefficient;
-		
-		if(Math.abs(desiredL) > 0.25) drive.leftDrive.motorController.set(-desiredL);
-		else drive.leftDrive.motorController.set(0);
-		if(Math.abs(desiredR) > 0.25) drive.rightDrive.motorController.set(desiredR);
-		else drive.rightDrive.motorController.set(0);
 		
 		//drive.leftDrive.getPIDController().setPID(1, 0, 0);
 
@@ -209,8 +270,8 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("Right Current Encoder", drive.rightDrive.encoderSpeed);
 		SmartDashboard.putNumber("Left Current", drive.leftDrive.motorController.get());
 		SmartDashboard.putNumber("Right Current", drive.rightDrive.motorController.get());
-		SmartDashboard.putNumber("Left Joystick", desiredL);
-		SmartDashboard.putNumber("Right Joystick", desiredR);
+		//SmartDashboard.putNumber("Left Joystick", desiredL);
+		//SmartDashboard.putNumber("Right Joystick", desiredR);
 		
 		//tracker.showImage();
 	}
